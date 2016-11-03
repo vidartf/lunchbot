@@ -14,15 +14,18 @@ FACEBOOK_ID = '339247333108301'
 
 sc = SlackClient(SLACK_TOKEN)
 
+channels = ['biocomp', 'lunchbotdev']
+
 def post_menu(menu_message):
-   sc.api_call(
-       'chat.postMessage',
-       channel="lunchbotdev",
-       text=menu_message,
-       as_user=False,
-       username='lunchbot',
-       icon_emoji=':spaghetti:'
-   )
+    for ch in channels:
+        sc.api_call(
+            'chat.postMessage',
+            channel=ch,
+            text=menu_message,
+            as_user=False,
+            username='lunchbot',
+            icon_emoji=':spaghetti:'
+        )
 
 def get_facebook_token(id, secret):
     graph = GraphAPI()
