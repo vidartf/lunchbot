@@ -32,40 +32,52 @@ def get_facebook_token(id, secret):
     return token.replace('access_token=', '')
 
 
-# Initialize the Graph API with a valid access facebook_token (optional,
-# but will allow you to do all sorts of fun stuff).
-facebook_token = get_facebook_token(FACEBOOK_ID, FACEBOOK_SECRET)
-graph = GraphAPI(facebook_token)
 
-# Get my latest posts
-posts = graph.get('technopolisitfornebu/posts')
-data = posts['data']
+try:
+    # Initialize the Graph API with a valid access facebook_token (optional,
+    # but will allow you to do all sorts of fun stuff).
+    facebook_token = get_facebook_token(FACEBOOK_ID, FACEBOOK_SECRET)
+    graph = GraphAPI(facebook_token)
 
-pattern_third_floor = 'Meny uke \d+, Expeditionen'
-pattern_first_floor = 'Meny uke \d+, Transit'
-pattern_days = 'MANDAG\n(.*)\n*TIRSDAG\n(.*)\n*ONSDAG\n(.*)\n*TORSDAG\n(.*)\n*FREDAG\n(.*)\n*'
+    # Get my latest posts
+    posts = graph.get('technopolisitfornebu/posts')
+    data = posts['data']
 
-menu_first_floor = None
-menu_third_floor = None
+    pattern_third_floor = 'Meny uke (\d+), Expeditionen'
+    pattern_first_floor = 'Meny uke (\d+), Transit'
+    pattern_days = 'MANDAG\n(.*)\n*TIRSDAG\n(.*)\n*ONSDAG\n(.*)\n*TORSDAG\n(.*)\n*FREDAG\n(.*)\n*'
 
-for post in data:
-    time = post['created_time']
-    message = post['message']
+    menu_first_floor = None
+    menu_third_floor = None
 
+    week_number = datetime.datetime.today().isocalendar()[1]
 
-    if menu_third_floor is None and None is not re.match(pattern_third_floor, message, flags=re.IGNORECASE):
-        match = re.search(pattern_days, message, flags=re.IGNORECASE | re.DOTALL)
-        if match:
-            menu_third_floor = match.group(1, 2, 3, 4, 5)
-    elif menu_first_floor is None and None is not re.match(pattern_first_floor, message, flags=re.IGNORECASE):
-        match = re.search(pattern_days, message, flags=re.IGNORECASE | re.DOTALL)
-        if match:
-            menu_first_floor = match.group(1, 2, 3, 4, 5)
+    for post in data:
+        time = post['created_time']
+        message = post['message']
 
-    if menu_first_floor is not None and menu_third_floor is not None:
-        break
+        week_match_third = re.match(pattern_third_floor, message, flags=re.IGNORECASE)
+        week_match_first = re.match(pattern_first_floor, message, flags=re.IGNORECASE)
+        if menu_third_floor is None and week_match_third is not None and int(week_match_third.group(1)) == week_number:
+            match = re.search(pattern_days, message, flags=re.IGNORECASE | re.DOTALL)
+            if match:
+                menu_third_floor = match.group(1, 2, 3, 4, 5)
+        elif menu_first_floor is None and week_match_first is not None and int(week_match_first.group(1)) == week_number:
+            match = re.search(pattern_days, message, flags=re.IGNORECASE | re.DOTALL)
+            if match:
+                menu_first_floor = match.group(1, 2, 3, 4, 5)
 
-day = datetime.datetime.today().weekday()
-if day < 5:
-    post_menu('*First floor menu:*\n' + menu_first_floor[day])
-    post_menu('*Third floor menu:*\n' + menu_third_floor[day])
+        if menu_first_floor is not None and menu_third_floor is not None:
+            break
+
+finally:
+    day = datetime.datetime.today().weekday()
+    if day < 5:
+        if menu_first_floor and menu_first_floor[day]:
+            post_menu('*First floor menu:*\n' + menu_first_floor[day])
+        else:
+            post_menu('_Could not find a menu for first floor today_ :disappointed:')
+        if menu_third_floor and menu_third_floor[day]:
+            post_menu('*Third floor menu:*\n' + menu_third_floor[day])
+        else:
+            post_menu('_Could not find a menu for third floor today_ :disappointed:')
