@@ -18,7 +18,10 @@ def post_menu(menu_message):
    sc.api_call(
        'chat.postMessage',
        channel="lunchbotdev",
-       text=menu_message
+       text=menu_message,
+       as_user=False,
+       username='lunchbot',
+       icon_emoji=':spaghetti:'
    )
 
 def get_facebook_token(id, secret):
