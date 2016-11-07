@@ -79,8 +79,8 @@ finally:
         if menu_first_floor and menu_first_floor[day]:
             post_menu('*First floor menu:*\n' + menu_first_floor[day])
         else:
-            post_menu('_Could not find a menu for first floor today_ :disappointed:')
+            post_menu('_Could not find a menu for the first floor today_ :disappointed:')
         if menu_third_floor and menu_third_floor[day]:
             post_menu('*Third floor menu:*\n' + menu_third_floor[day])
         else:
-            post_menu('_Could not find a menu for third floor today_ :disappointed:')
+            post_menu('_Could not find a menu for the third floor today_ :disappointed:')
