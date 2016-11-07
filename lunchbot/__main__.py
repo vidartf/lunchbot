@@ -4,13 +4,24 @@
 import re
 import os
 import datetime
+import configparser
 
 from slackclient import SlackClient
 from facepy import GraphAPI
 
-SLACK_TOKEN = os.environ["SLACK_API_TOKEN"]
-FACEBOOK_SECRET = os.environ["FACEBOOK_API_SECRET"]
-FACEBOOK_ID = '339247333108301'
+here = os.path.abspath(os.path.dirname(__file__))
+
+config = configparser.SafeConfigParser()
+files = config.read(['./lunchbot.ini', os.path.join(here, 'lunchbot.ini'), '~/lunchbot.ini', '~/.lunchbot.rc'])
+
+SLACK_TOKEN = config.get('Slack', 'token', fallback=os.environ.get("SLACK_API_TOKEN", None))
+FACEBOOK_SECRET = config.get('Facebook', 'secret', fallback=os.environ.get("FACEBOOK_API_SECRET", None))
+FACEBOOK_ID = config.get('Facebook', 'id', fallback=os.environ.get("FACEBOOK_API_ID", None))
+
+if None in (SLACK_TOKEN, FACEBOOK_SECRET, FACEBOOK_ID):
+    raise ValueError("Missing configuration value")
+
+
 
 sc = SlackClient(SLACK_TOKEN)
 
