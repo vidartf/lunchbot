@@ -59,8 +59,8 @@ try:
     posts = graph.get('technopolisitfornebu/posts')
     data = posts['data']
 
-    pattern_third_floor = 'Meny uke (\d+), Expeditionen'
     pattern_first_floor = 'Meny uke (\d+), Transit'
+    pattern_third_floor = 'Meny uke (\d+), Expeditionen'
     pattern_days = [
         'MANDAG\n?(.*)\n*(TIRSDAG)|(ONSDAG)|(TORSDAG)|(FREDAG)|$',
         'TIRSDAG\n?(.*)\n*(ONSDAG)|(TORSDAG)|(FREDAG)|$',
@@ -78,20 +78,20 @@ try:
         time = post['created_time']
         message = post['message']
 
-        week_match_third = re.match(pattern_third_floor, message, flags=re.IGNORECASE)
         week_match_first = re.match(pattern_first_floor, message, flags=re.IGNORECASE)
-        if menu_third_floor is None and week_match_third is not None and int(week_match_third.group(1)) == week_number:
-            menu_third_floor = [None] * 5
-            for day in range(5):
-                match = re.search(pattern_days[day], message, flags=re.IGNORECASE | re.DOTALL)
-                if match:
-                    menu_third_floor[day] = match.group(1)
-        elif menu_first_floor is None and week_match_first is not None and int(week_match_first.group(1)) == week_number:
+        week_match_third = re.match(pattern_third_floor, message, flags=re.IGNORECASE)
+        if menu_first_floor is None and week_match_first is not None and int(week_match_first.group(1)) == week_number:
             menu_first_floor = [None] * 5
             for day in range(5):
                 match = re.search(pattern_days[day], message, flags=re.IGNORECASE | re.DOTALL)
                 if match:
                     menu_first_floor[day] = match.group(1)
+        elif menu_third_floor is None and week_match_third is not None and int(week_match_third.group(1)) == week_number:
+            menu_third_floor = [None] * 5
+            for day in range(5):
+                match = re.search(pattern_days[day], message, flags=re.IGNORECASE | re.DOTALL)
+                if match:
+                    menu_third_floor[day] = match.group(1)
 
         if menu_first_floor is not None and menu_third_floor is not None:
             break
