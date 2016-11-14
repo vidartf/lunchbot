@@ -14,15 +14,24 @@ from facepy import GraphAPI
 here = os.path.abspath(os.path.dirname(__file__))
 
 config = configparser.SafeConfigParser()
-files = config.read(['./lunchbot.ini', os.path.join(here, 'lunchbot.ini'), '~/lunchbot.ini', '~/.lunchbot.rc'])
+files = config.read([
+    './lunchbot.ini',
+    os.path.join(here, 'lunchbot.ini'),
+    '~/lunchbot.ini',
+    '~/.lunchbot.rc'])
 
-SLACK_TOKEN = config.get('Slack', 'token', fallback=os.environ.get("SLACK_API_TOKEN", None))
-FACEBOOK_SECRET = config.get('Facebook', 'secret', fallback=os.environ.get("FACEBOOK_API_SECRET", None))
-FACEBOOK_ID = config.get('Facebook', 'id', fallback=os.environ.get("FACEBOOK_API_ID", None))
+SLACK_TOKEN = config.get(
+    'Slack', 'token',
+    fallback=os.environ.get("SLACK_API_TOKEN", None))
+FACEBOOK_SECRET = config.get(
+    'Facebook', 'secret',
+    fallback=os.environ.get("FACEBOOK_API_SECRET", None))
+FACEBOOK_ID = config.get(
+    'Facebook', 'id',
+    fallback=os.environ.get("FACEBOOK_API_ID", None))
 
 if None in (SLACK_TOKEN, FACEBOOK_SECRET, FACEBOOK_ID):
     raise ValueError("Missing configuration value")
-
 
 
 sc = SlackClient(SLACK_TOKEN)
@@ -40,13 +49,13 @@ def post_menu(menu_message):
             icon_emoji=':spaghetti:'
         )
 
+
 def get_facebook_token(id, secret):
     graph = GraphAPI()
     request = 'oauth/access_token?client_id=%s&client_secret=%s&grant_type=client_credentials'
     token = graph.get(request % (id, secret))
     # Remove prefix:
     return token.replace('access_token=', '')
-
 
 
 try:
