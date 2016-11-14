@@ -85,6 +85,8 @@ try:
 
     for post in data:
         time = post['created_time']
+        if 'message' not in post:
+            continue
         message = post['message']
 
         week_match_first = re.match(pattern_first_floor, message, flags=re.IGNORECASE)
