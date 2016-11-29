@@ -68,8 +68,8 @@ try:
     posts = graph.get('technopolisitfornebu/posts')
     data = posts['data']
 
-    pattern_first_floor = 'Meny uke (\d+), Transit'
-    pattern_third_floor = 'Meny uke (\d+), Expeditionen'
+    pattern_first_floor = r'Meny uke (\d+),.*1.*(etg|etasje|etage)'
+    pattern_third_floor = r'Meny uke (\d+),.*3.*(etg|etasje|etage)'
     pattern_days = [
         'MANDAG\n?(.*)\n*(TIRSDAG)|(ONSDAG)|(TORSDAG)|(FREDAG)|$',
         'TIRSDAG\n?(.*)\n*(ONSDAG)|(TORSDAG)|(FREDAG)|$',
