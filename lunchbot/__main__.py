@@ -36,7 +36,8 @@ if None in (SLACK_TOKEN, FACEBOOK_SECRET, FACEBOOK_ID):
 
 sc = SlackClient(SLACK_TOKEN)
 
-channels = ['biocomp', 'lunchbotdev']
+channels = ['lunch', 'lunchbotdev']
+
 
 def post_menu(menu_message):
     for ch in channels:
