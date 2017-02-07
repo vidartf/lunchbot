@@ -17,8 +17,8 @@ config = configparser.SafeConfigParser()
 files = config.read([
     './lunchbot.ini',
     os.path.join(here, 'lunchbot.ini'),
-    '~/lunchbot.ini',
-    '~/.lunchbot.rc'])
+    os.path.expanduser('~/lunchbot.ini'),
+    os.path.expanduser('~/.lunchbot.rc')])
 
 SLACK_TOKEN = config.get(
     'Slack', 'token',
