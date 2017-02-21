@@ -72,11 +72,11 @@ try:
     pattern_first_floor = r'Meny uke (\d+),.*1.*(etg|etasje|etage)'
     pattern_third_floor = r'Meny uke (\d+),.*3.*(etg|etasje|etage)'
     pattern_days = [
-        'MANDAG\n?(.*)\n*(TIRSDAG)|(ONSDAG)|(TORSDAG)|(FREDAG)|$',
-        'TIRSDAG\n?(.*)\n*(ONSDAG)|(TORSDAG)|(FREDAG)|$',
-        'ONSDAG\n?(.*)\n*(TORSDAG)|(FREDAG)|$',
-        'TORSDAG\n?(.*)\n*(FREDAG)|$',
-        'FREDAG\n?(.*)\n*$'
+        r'(MANDAG|MONDAY)\n?(.*?)\n*(TIRSDAG|TUESDAY|ONSDAG|WEDNESDAY|WENDSDAY|TORSDAG|THURSDAY|FREDAG|FRIDAY)|$',
+        r'(TIRSDAG|TUESDAY)\n?(.*?)\n*(ONSDAG|WEDNESDAY|WENDSDAY|TORSDAG|THURSDAY|FREDAG|FRIDAY)|$',
+        r'(ONSDAG|WEDNESDAY|WENDSDAY)\n?(.*?)\n*(TORSDAG|THURSDAY|FREDAG|FRIDAY)|$',
+        r'(TORSDAG|THURSDAY)\n?(.*?)\n*(FREDAG|FRIDAY)|$',
+        r'(FREDAG|FRIDAY)\n?(.*?)\n*$'
     ]
 
     menu_first_floor = None
@@ -96,14 +96,14 @@ try:
             menu_first_floor = [None] * 5
             for day in range(5):
                 match = re.search(pattern_days[day], message, flags=re.IGNORECASE | re.DOTALL)
-                if match:
-                    menu_first_floor[day] = match.group(1)
+                if match and match.group(2):
+                    menu_first_floor[day] = match.group(2)
         elif menu_third_floor is None and week_match_third is not None and int(week_match_third.group(1)) == week_number:
             menu_third_floor = [None] * 5
             for day in range(5):
                 match = re.search(pattern_days[day], message, flags=re.IGNORECASE | re.DOTALL)
-                if match:
-                    menu_third_floor[day] = match.group(1)
+                if match and match.group(2):
+                    menu_third_floor[day] = match.group(2)
 
         if menu_first_floor is not None and menu_third_floor is not None:
             break
