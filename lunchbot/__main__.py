@@ -7,11 +7,21 @@ import re
 import os
 import datetime
 import configparser
+import logging
+import argparse
 
 from slackclient import SlackClient
 from facepy import GraphAPI
 
+parser = argparse.ArgumentParser(
+    description='A bot for slack that fetches and parses the lunch menu for Technopolis IT Fornebu'
+)
+parser.add_argument("-v", "--verbose", help="increase output verbosity",
+                    action="store_true")
+arguments = parser.parse_args()
+
 here = os.path.abspath(os.path.dirname(__file__))
+logger = logging.getLogger('lunchbot')
 
 config = configparser.SafeConfigParser()
 files = config.read([
@@ -33,7 +43,14 @@ FACEBOOK_ID = config.get(
 if None in (SLACK_TOKEN, FACEBOOK_SECRET, FACEBOOK_ID):
     raise ValueError("Missing configuration value")
 
+if arguments.verbose:
+    loglevel = 'DEBUG'
+else:
+    loglevel = config.get('General', 'log-level', fallback='INFO')
+logging.basicConfig(level=loglevel)
 
+
+logger.info('Initializing slack client...')
 sc = SlackClient(SLACK_TOKEN)
 
 channels = ['lunch', 'lunchbotdev']
@@ -62,10 +79,12 @@ def get_facebook_token(id, secret):
 try:
     # Initialize the Graph API with a valid access facebook_token (optional,
     # but will allow you to do all sorts of fun stuff).
+    logger.info('Initializing Facebook graph API...')
     facebook_token = get_facebook_token(FACEBOOK_ID, FACEBOOK_SECRET)
     graph = GraphAPI(facebook_token)
 
     # Get my latest posts
+    logger.info('Getting facebook posts...')
     posts = graph.get('technopolisitfornebu/posts')
     data = posts['data']
 
@@ -93,17 +112,29 @@ try:
         week_match_first = re.match(pattern_first_floor, message, flags=re.IGNORECASE)
         week_match_third = re.match(pattern_third_floor, message, flags=re.IGNORECASE)
         if menu_first_floor is None and week_match_first is not None and int(week_match_first.group(1)) == week_number:
+            logger.info('Found post that matches first floor menu for this week')
             menu_first_floor = [None] * 5
             for day in range(5):
                 match = re.search(pattern_days[day], message, flags=re.IGNORECASE | re.DOTALL)
                 if match and match.group(2):
+                    logger.info('Found menu for day %d' % day)
+                    logger.debug(match.groups())
                     menu_first_floor[day] = match.group(2)
+                else:
+                    logger.warning('Could not find menu for day %d. Match: %s' % (day, match.groups()))
+                    logger.warning('Message: %r' % message)
         elif menu_third_floor is None and week_match_third is not None and int(week_match_third.group(1)) == week_number:
+            logger.info('Found post that matches third floor menu for this week')
             menu_third_floor = [None] * 5
             for day in range(5):
                 match = re.search(pattern_days[day], message, flags=re.IGNORECASE | re.DOTALL)
                 if match and match.group(2):
+                    logger.info('Found menu for day %d' % day)
+                    logger.debug(match.groups())
                     menu_third_floor[day] = match.group(2)
+                else:
+                    logger.warning('Could not find menu for day %d. Match: %s' % (day, match))
+                    logger.warning('Message: %s' % message)
 
         if menu_first_floor is not None and menu_third_floor is not None:
             break
