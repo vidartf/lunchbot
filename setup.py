@@ -38,6 +38,13 @@ setuptools_args['install_requires'] = [
     'slackclient'
 ]
 
+extras_require = setuptools_args['extras_require'] = {
+    'test': [
+        'pytest',
+        'python-dateutil',
+    ],
+}
+
 if 'setuptools' in sys.modules:
     setup_args.update(setuptools_args)
 

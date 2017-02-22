@@ -1,0 +1,26 @@
+Meny uke 7, Transit 1.etg
+
+MANDAG
+DAGENS VARMRETT: Mac n Cheese Kr 46;
+SUPPE: Purresuppe Kr 15;
+DAGENS SALAT: Salat med beef Kr 9,5/hg
+
+TIRSDAG
+DAGENS FISK: Lakselasagne med sitronkrem og spinatsalat Kr 46;
+SUPPE: Kjøttsuppe Kr 15;
+DAGENS SALAT: Kyllingsalat 9,5/hg
+
+ONSDAG
+DAGENS VARMRETT: Pasta Carbonara Kr 46;
+SUPPE: Lamm kraft suppe 15;
+DAGENS SALAT: Salat med egg Kr 9,5/hg
+
+TORSDAG
+DAGENS FISK: Kålpudding med gløggsaus, tyttebær og stekte poteter kr 46;
+SUPPE: Fiskesuppe Kr 15;
+DAGENS SALAT: Salat med røket laks og egg Kr 9,5/hg
+
+FREDAG
+VARMRETT: Foccacia Pizza med tilbehør Kr 46; 
+SUPPE: Løksuppe Kr 15;
+DAGENS SALAT: Avocadosalat Kr 9,5/hg
