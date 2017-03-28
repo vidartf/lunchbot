@@ -40,6 +40,8 @@ def run(args=None, post_menu=None):
         sp = SlackPoster(SLACK_TOKEN, channels)
         post_menu = sp.post
 
+    menu_first_floor = None
+    menu_third_floor = None
 
     try:
         logger.info('Initializing Facebook graph API...')
