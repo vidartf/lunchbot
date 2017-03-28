@@ -14,7 +14,7 @@ from .apiwrappers import authenticated_graph, filter_messages, SlackPoster
 logger = logging.getLogger('lunchbot')
 
 # Where to post:
-channels = ['lunchbotdev']
+channels = ['lunch', 'lunchbotdev']
 
 pattern_first_floor = r'Meny uke (\d+),.*1.*(etg|etasje|etage)'
 pattern_third_floor = r'Meny uke (\d+),.*3.*(etg|etasje|etage)'
