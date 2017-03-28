@@ -10,8 +10,14 @@ def get_facebook_token(id, secret):
     graph = GraphAPI()
     request = 'oauth/access_token?client_id=%s&client_secret=%s&grant_type=client_credentials'
     token = graph.get(request % (id, secret))
-    # Remove prefix:
-    return token.replace('access_token=', '')
+    if isinstance(token, dict):
+        return token['access_token']
+    elif isinstance(token, str):
+        # Remove prefix:
+        return token.replace('access_token=', '')
+    else:
+        raise ValueError(
+            'Facebook GraphAPI token returned by Facebook of unknown type')
 
 
 def authenticated_graph(id, secret):
