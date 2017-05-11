@@ -16,14 +16,14 @@ logger = logging.getLogger('lunchbot')
 # Where to post:
 channels = ['lunch', 'lunchbotdev']
 
-pattern_first_floor = r'Meny uke (\d+),.*1.*(etg|etasje|etage)'
-pattern_third_floor = r'Meny uke (\d+),.*3.*(etg|etasje|etage)'
+pattern_first_floor = r'Meny (uke|week) (?P<weeknum>\d+)\D.*?1.*?(etg|etasje|etage)'
+pattern_third_floor = r'Meny (uke|week) (?P<weeknum>\d+)\D.*?3.*?(etg|etasje|etage)'
 floor_flags = re.IGNORECASE
 
 pattern_days = [
-    r'(MANDAG|MONDAY)\n?(.*?)\n*(TIRSDAG|TUESDAY|ONSDAG|WEDNESDAY|WENDSDAY|TORSDAG|THURSDAY|FREDAG|FRIDAY)|$',
-    r'(TIRSDAG|TUESDAY)\n?(.*?)\n*(ONSDAG|WEDNESDAY|WENDSDAY|TORSDAG|THURSDAY|FREDAG|FRIDAY)|$',
-    r'(ONSDAG|WEDNESDAY|WENDSDAY)\n?(.*?)\n*(TORSDAG|THURSDAY|FREDAG|FRIDAY)|$',
+    r'(MANDAG|MONDAY)\n?(.*?)\n*(TIRSDAG|TUESDAY|ONSDAG|WEDNESDAY|WENDSDAY|WEDNESAY|TORSDAG|THURSDAY|FREDAG|FRIDAY)|$',
+    r'(TIRSDAG|TUESDAY)\n?(.*?)\n*(ONSDAG|WEDNESDAY|WENDSDAY"WEDNESAY|TORSDAG|THURSDAY|FREDAG|FRIDAY)|$',
+    r'(ONSDAG|WEDNESDAY|WENDSDAY|WEDNESAY)\n?(.*?)\n*(TORSDAG|THURSDAY|FREDAG|FRIDAY)|$',
     r'(TORSDAG|THURSDAY)\n?(.*?)\n*(FREDAG|FRIDAY)|$',
     r'(FREDAG|FRIDAY)\n?(.*?)\n*$'
 ]
@@ -79,7 +79,7 @@ def get_menus_for_week(posts, week_number):
 
         if menu_first_floor is None and is_matching_message(message, pattern_first_floor, week_number):
             logger.info('Found post that matches first floor menu for this week')
-            menu_first_floor = extract_menu(message, )
+            menu_first_floor = extract_menu(message)
         elif menu_third_floor is None and is_matching_message(message, pattern_third_floor, week_number):
             logger.info('Found post that matches third floor menu for this week')
             menu_third_floor = extract_menu(message)
@@ -92,7 +92,7 @@ def get_menus_for_week(posts, week_number):
 def is_matching_message(message, floor_pattern, week_number):
     """Check if a message conatins a menu for given floor pattern and week number"""
     week_match = re.match(floor_pattern, message, flags=floor_flags)
-    return week_match is not None and int(week_match.group(1)) == week_number
+    return week_match is not None and int(week_match.group('weeknum')) == week_number
 
 
 def extract_menu(message):
