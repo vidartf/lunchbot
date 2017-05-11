@@ -18,8 +18,14 @@ here = os.path.abspath(os.path.dirname(__file__))
 # Menus where the menu was posted in a different week:
 weeknum_override = {
     '161216-third.txt': 51,
-    '160704-third.txt': 26,
     '161007-first.txt': 41,
+    '160704-third.txt': 26,
+    '160226-first.txt': 9,
+    '160219-third.txt': 8,
+    '160122-first.txt': 4,
+    '160122-third.txt': 4,
+    '160108-first.txt': 2,
+    '160108-third.txt': 2,
 }
 
 # Days that are known to be missing from menus:
@@ -28,6 +34,8 @@ known_missing = {
     '161108-third.txt': (0,),
     '161115-third.txt': (0,),
     '161122-third.txt': (0,),
+    '160329-first.txt': (0,),
+    '160329-third.txt': (0,),
 }
 
 
