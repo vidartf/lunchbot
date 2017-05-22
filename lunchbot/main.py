@@ -16,16 +16,18 @@ logger = logging.getLogger('lunchbot')
 # Where to post:
 channels = ['lunch', 'lunchbotdev']
 
-pattern_first_floor = r'Meny (uke|week) (?P<weeknum>\d+)\D.*?1.*?(etg|etasje|etage)'
-pattern_third_floor = r'Meny (uke|week) (?P<weeknum>\d+)\D.*?3.*?(etg|etasje|etage)'
+patterns_first_floor = (r'(Meny|Menu) (uke|week) (?P<weeknum>\d+)\D.*?1.*?(etg|etasje|etage)',
+    r'(Meny|Menu) Expeditionen (uke|week) (?P<weeknum>\d+):')
+patterns_third_floor = (r'Meny (uke|week) (?P<weeknum>\d+)\D.*?3.*?(etg|etasje|etage)',
+    r'(Meny|Menu) Transit (uke|week) (?P<weeknum>\d+):')
 floor_flags = re.IGNORECASE
 
 pattern_days = [
-    r'(MANDAG|MONDAY)\n?(.*?)\n*(TIRSDAG|TUESDAY|ONSDAG|WEDNESDAY|WENDSDAY|WEDNESAY|TORSDAG|THURSDAY|FREDAG|FRIDAY)|$',
-    r'(TIRSDAG|TUESDAY)\n?(.*?)\n*(ONSDAG|WEDNESDAY|WENDSDAY"WEDNESAY|TORSDAG|THURSDAY|FREDAG|FRIDAY)|$',
-    r'(ONSDAG|WEDNESDAY|WENDSDAY|WEDNESAY)\n?(.*?)\n*(TORSDAG|THURSDAY|FREDAG|FRIDAY)|$',
-    r'(TORSDAG|THURSDAY)\n?(.*?)\n*(FREDAG|FRIDAY)|$',
-    r'(FREDAG|FRIDAY)\n?(.*?)\n*$'
+    r'(MANDAG|MONDAY):?\n?(.*?)\n*(TIRSDAG|TUESDAY|ONSDAG|WEDNESDAY|WENDSDAY|WEDNESAY|TORSDAG|THURSDAY|FREDAG|FRIDAY)|$',
+    r'(TIRSDAG|TUESDAY):?\n?(.*?)\n*(ONSDAG|WEDNESDAY|WENDSDAY"WEDNESAY|TORSDAG|THURSDAY|FREDAG|FRIDAY)|$',
+    r'(ONSDAG|WEDNESDAY|WENDSDAY|WEDNESAY):?\n?(.*?)\n*(TORSDAG|THURSDAY|FREDAG|FRIDAY)|$',
+    r'(TORSDAG|THURSDAY):?\n?(.*?)\n*(FREDAG|FRIDAY)|$',
+    r'(FREDAG|FRIDAY):?\n?(.*?)\n*$'
 ]
 days_flags = re.IGNORECASE | re.DOTALL
 
@@ -77,10 +79,10 @@ def get_menus_for_week(posts, week_number):
         # time = post['created_time']
         message = post['message']
 
-        if menu_first_floor is None and is_matching_message(message, pattern_first_floor, week_number):
+        if menu_first_floor is None and is_matching_message(message, patterns_first_floor, week_number):
             logger.info('Found post that matches first floor menu for this week')
             menu_first_floor = extract_menu(message)
-        elif menu_third_floor is None and is_matching_message(message, pattern_third_floor, week_number):
+        elif menu_third_floor is None and is_matching_message(message, patterns_third_floor, week_number):
             logger.info('Found post that matches third floor menu for this week')
             menu_third_floor = extract_menu(message)
 
@@ -89,10 +91,13 @@ def get_menus_for_week(posts, week_number):
     return menu_first_floor, menu_third_floor
 
 
-def is_matching_message(message, floor_pattern, week_number):
+def is_matching_message(message, floor_patterns, week_number):
     """Check if a message conatins a menu for given floor pattern and week number"""
-    week_match = re.match(floor_pattern, message, flags=floor_flags)
-    return week_match is not None and int(week_match.group('weeknum')) == week_number
+    for floor_pattern in floor_patterns:
+        week_match = re.match(floor_pattern, message, flags=floor_flags)
+        if week_match is not None and int(week_match.group('weeknum')) == week_number:
+            return True
+    return False
 
 
 def extract_menu(message):

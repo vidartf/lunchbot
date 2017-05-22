@@ -7,7 +7,7 @@ import re
 
 from lunchbot.main import (
     is_matching_message, extract_menu, get_menus_for_week,
-    pattern_first_floor, pattern_third_floor)
+    patterns_first_floor, patterns_third_floor)
 
 
 pattern_daynames = re.compile(r'MANDAG|TIRSDAG|ONSDAG|TORSDAG|FREDAG|MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY')
@@ -28,9 +28,9 @@ def test_extract_menu(historical):
 
 def test_first_floor_match(historical_first_floor):
     week_num, message = historical_first_floor
-    assert is_matching_message(message, pattern_first_floor, week_num)
+    assert is_matching_message(message, patterns_first_floor, week_num)
 
 
 def test_third_floor_match(historical_third_floor):
     week_num, message = historical_third_floor
-    assert is_matching_message(message, pattern_third_floor, week_num)
+    assert is_matching_message(message, patterns_third_floor, week_num)
