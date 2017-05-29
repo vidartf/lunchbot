@@ -32,7 +32,7 @@ pattern_days = [
 days_flags = re.IGNORECASE | re.DOTALL
 
 
-def run(args=None, post_menu=None):
+def run(post_menu=None):
     if None in (SLACK_TOKEN, FACEBOOK_SECRET, FACEBOOK_ID):
         raise ValueError("Missing configuration value")
 
@@ -85,6 +85,8 @@ def get_menus_for_week(posts, week_number):
         elif menu_third_floor is None and is_matching_message(message, patterns_third_floor, week_number):
             logger.info('Found post that matches third floor menu for this week')
             menu_third_floor = extract_menu(message)
+        else:
+            logger.debug('Not a menu for week %d:\n%s' % (week_number, message))
 
         if menu_first_floor is not None and menu_third_floor is not None:
             break
@@ -115,16 +117,16 @@ def extract_menu(message):
     return menu
 
 
-def main(args=None):
+def main(args=None, post_menu=None):
     # Set up logging:
-    arguments = parser.parse_args()
+    arguments = parser.parse_args(args)
     if arguments.verbose:
         loglevel = 'DEBUG'
     else:
         loglevel = config.get('General', 'log-level', fallback='INFO')
     logging.basicConfig(level=loglevel)
 
-    run(args)
+    run(post_menu=post_menu)
 
 if __name__ == '__main__':
     main()
