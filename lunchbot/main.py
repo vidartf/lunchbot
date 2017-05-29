@@ -17,9 +17,9 @@ logger = logging.getLogger('lunchbot')
 channels = ['lunch', 'lunchbotdev']
 
 patterns_first_floor = (r'(Meny|Menu) (uke|week) (?P<weeknum>\d+)\D.*?1.*?(etg|etasje|etage)',
-    r'(Meny|Menu) Expeditionen (uke|week) (?P<weeknum>\d+):')
+    r'(Meny|Menu) Expeditionen (uke|week) (?P<weeknum>\d+):?')
 patterns_third_floor = (r'Meny (uke|week) (?P<weeknum>\d+)\D.*?3.*?(etg|etasje|etage)',
-    r'(Meny|Menu) Transit (uke|week) (?P<weeknum>\d+):')
+    r'(Meny|Menu) Transit (uke|week) (?P<weeknum>\d+):?')
 floor_flags = re.IGNORECASE
 
 pattern_days = [
