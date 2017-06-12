@@ -36,6 +36,7 @@ known_missing = {
     '161122-third.txt': (0,),
     '160329-first.txt': (0,),
     '160329-third.txt': (0,),
+    '170607-combined.txt': (0, 1),
 }
 
 
@@ -60,6 +61,11 @@ def _first_floor():
 def _third_floor():
     for fn in _historical():
         if fn.endswith('-third.txt'):
+            yield fn
+
+def _combined():
+    for fn in _historical():
+        if fn.endswith('-combined.txt'):
             yield fn
 
 
@@ -90,6 +96,13 @@ def historical_first_floor(request):
 
 @pytest.fixture(params=_third_floor())
 def historical_third_floor(request):
+    path = request.param
+    week_num = _extract_week_num(path)
+    return week_num, get_file(path)
+
+
+@pytest.fixture(params=_combined())
+def historical_combined(request):
     path = request.param
     week_num = _extract_week_num(path)
     return week_num, get_file(path)

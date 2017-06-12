@@ -20,7 +20,12 @@ patterns_first_floor = (r'(Meny|Menu) (uke|week) (?P<weeknum>\d+)\D.*?1.*?(etg|e
     r'(Meny|Menu) Expeditionen (uke|week) (?P<weeknum>\d+):?')
 patterns_third_floor = (r'Meny (uke|week) (?P<weeknum>\d+)\D.*?3.*?(etg|etasje|etage)',
     r'(Meny|Menu) Transit (uke|week) (?P<weeknum>\d+):?')
+patterns_combined = (
+    r'(Meny|Menu) (uke|week) (?P<weeknum>\d+)[^\n]*\n+'
+    r'GATE 1 & 2 \(TRANSIT,? 1st FLOOR\)\n*(?P<first>.*?)\n+'
+    r'(EXPEDITIONEN|EXPEDISJON) \(3rd FLOOR\)\n*(?P<third>.*)',)
 floor_flags = re.IGNORECASE
+combined_flags = re.IGNORECASE | re.DOTALL
 
 pattern_days = [
     r'(MANDAG|MONDAY):?\n?(.*?)\n*(TIRSDAG|TUESDAY|ONSDAG|WEDNESDAY|WENDSDAY|WEDNESAY|TORSDAG|THURSDAY|FREDAG|FRIDAY)|$',
@@ -85,6 +90,14 @@ def get_menus_for_week(posts, week_number):
         elif menu_third_floor is None and is_matching_message(message, patterns_third_floor, week_number):
             logger.info('Found post that matches third floor menu for this week')
             menu_third_floor = extract_menu(message)
+        elif (menu_first_floor is None and menu_third_floor is None):
+            for pattern in patterns_combined:
+                match = re.match(pattern, message, flags=combined_flags)
+                if match is not None and int(match.group('weeknum')) == week_number:
+                    logger.info('Found post that matches a combined menu for this week')
+                    week_first, week_third = match.group('first', 'third')
+                    menu_first_floor = extract_menu(week_first)
+                    menu_third_floor = extract_menu(week_third)
         else:
             logger.debug('Not a menu for week %d:\n%s' % (week_number, message))
 
@@ -93,10 +106,12 @@ def get_menus_for_week(posts, week_number):
     return menu_first_floor, menu_third_floor
 
 
-def is_matching_message(message, floor_patterns, week_number):
+def is_matching_message(message, floor_patterns, week_number, flags=None):
     """Check if a message conatins a menu for given floor pattern and week number"""
+    if flags is None:
+        flags = floor_flags
     for floor_pattern in floor_patterns:
-        week_match = re.match(floor_pattern, message, flags=floor_flags)
+        week_match = re.match(floor_pattern, message, flags=flags)
         if week_match is not None and int(week_match.group('weeknum')) == week_number:
             return True
     return False
