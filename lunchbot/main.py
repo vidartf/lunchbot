@@ -23,7 +23,12 @@ patterns_third_floor = (r'Meny (uke|week) (?P<weeknum>\d+)\D.*?3.*?(etg|etasje|e
 patterns_combined = (
     r'(Meny|Menu) (uke|week) (?P<weeknum>\d+)[^\n]*\n+'
     r'GATE 1 & 2 \(TRANSIT,? 1st FLOOR\)\n*(?P<first>.*?)\n+'
-    r'(EXPEDITIONEN|EXPEDISJON) \(3rd FLOOR\)\n*(?P<third>.*)',)
+    r'(EXPEDITIONEN|EXPEDITONEN|EXPEDISJON) \(3rd FLOOR\)\n*(?P<third>.*)',
+
+    r'(Meny|Menu) (uke|week) (?P<weeknum>\d+)[^\n]*\n+'
+    r'TRANSIT,.*?1.*?(etg|etasje|etage)\n*(?P<first>.*?)\n+'
+    r'(EXPEDITIONEN|EXPEDITONEN|EXPEDISJON).*?3.*?(etg|etasje|etage)\n*(?P<third>.*)',
+    )
 floor_flags = re.IGNORECASE
 combined_flags = re.IGNORECASE | re.DOTALL
 
