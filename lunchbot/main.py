@@ -98,8 +98,11 @@ def get_menus_for_week(posts, week_number):
                     week_first, week_third = match.group('first', 'third')
                     menu_first_floor = extract_menu(week_first)
                     menu_third_floor = extract_menu(week_third)
+                    break
+            else:
+                logger.debug('Not a menu for week %d:\n%s', week_number, message)
         else:
-            logger.debug('Not a menu for week %d:\n%s' % (week_number, message))
+            logger.debug('Not a menu for week %d:\n%s', week_number, message)
 
         if menu_first_floor is not None and menu_third_floor is not None:
             break
@@ -123,12 +126,12 @@ def extract_menu(message):
     for day in range(5):
         match = re.search(pattern_days[day], message, flags=days_flags)
         if match and match.group(2):
-            logger.info('Found menu for day %d' % day)
+            logger.info('Found menu for day %d', day)
             logger.debug(match.groups())
             menu[day] = match.group(2)
         else:
-            logger.warning('Could not find menu for day %d. Match: %s' % (day, match.groups()))
-            logger.warning('Message: %r' % message)
+            logger.warning('Could not find menu for day %d. Match: %s', day, match.groups())
+            logger.warning('Message: %r', message)
     return menu
 
 
