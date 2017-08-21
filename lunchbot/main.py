@@ -26,8 +26,8 @@ patterns_combined = (
     r'(EXPEDITIONEN|EXPEDITONEN|EXPEDISJON) \(3rd FLOOR\)\n*(?P<third>.*)',
 
     r'(Meny|Menu) (uke|week) (?P<weeknum>\d+)[^\n]*\n+'
-    r'TRANSIT,.*?1.*?(etg|etasje|etage)\n*(?P<first>.*?)\n+'
-    r'(EXPEDITIONEN|EXPEDITONEN|EXPEDISJON).*?3.*?(etg|etasje|etage)\n*(?P<third>.*)',
+    r'TRANSIT(,.*?1.*?(etg|etasje|etage))?\n*(?P<first>.*?)\n+'
+    r'(EXPEDITIONEN|EXPEDITONEN|EXPEDISJON)(.*?3.*?(etg|etasje|etage))?:?\n*(?P<third>.*)',
     )
 floor_flags = re.IGNORECASE
 combined_flags = re.IGNORECASE | re.DOTALL
@@ -135,7 +135,9 @@ def extract_menu(message):
             logger.debug(match.groups())
             menu[day] = match.group(2)
         else:
-            logger.warning('Could not find menu for day %d. Match: %s', day, match.groups())
+            logger.warning('Could not find menu for day %d.', day)
+            if match:
+                logger.warning('Match: %s', match.groups())
             logger.warning('Message: %r', message)
     return menu
 
