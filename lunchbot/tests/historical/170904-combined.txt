@@ -1,0 +1,55 @@
+Meny uke 36
+
+TRANSIT, 1. etg:
+
+Monday:
+Salmon
+Onion Soup
+Greek Salad
+
+Tuesday:
+Chicken
+Fish Soup
+Oven Baked Vegetables
+
+Wednesday:
+Home Made Ribbe
+Tomato Soup
+Shrimp Salad
+
+Thursday:
+Fish n Chips
+Bean Soup
+Salad with Serrano 
+
+Friday:
+Beef Stroganoff with mash
+Asparegus Soup
+Pasta Salad with Chicken 
+
+EXPEDITIONEN, 3.etg:
+
+Monday:
+Meatballs with carrot Sauce 
+Lentil Soup
+Broccoli and Bacon Salad
+
+Tuesday:
+Salmon
+Asparegus Soup
+Salad with Avocado and chicken
+
+Wednesday:
+Pork Neck
+Tomato Soup
+Cheese and Ham Salad
+
+Thursday:
+Springrolls with fried rice and vegetables
+Spinach Soup
+Summer Salad
+
+Friday:
+Hot dogs with side orders
+Fish Soup
+Beef Salad

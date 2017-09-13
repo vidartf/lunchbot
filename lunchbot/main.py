@@ -21,11 +21,11 @@ patterns_first_floor = (r'(Meny|Menu) (uke|week) (?P<weeknum>\d+)\D.*?1.*?(etg|e
 patterns_third_floor = (r'Meny (uke|week) (?P<weeknum>\d+)\D.*?3.*?(etg|etasje|etage)',
     r'(Meny|Menu) Transit (uke|week) (?P<weeknum>\d+):?')
 patterns_combined = (
-    r'(Meny|Menu) (uke|week) (?P<weeknum>\d+)[^\n]*\n+'
+    r'(Meny(er)?|Menus?) (uke|week) (?P<weeknum>\d+)[^\n]*\n+'
     r'GATE 1 & 2 \(TRANSIT,? 1st FLOOR\)\n*(?P<first>.*?)\n+'
     r'(EXPEDITIONEN|EXPEDITONEN|EXPEDISJON) \(3rd FLOOR\)\n*(?P<third>.*)',
 
-    r'(Meny|Menu) (uke|week) (?P<weeknum>\d+)[^\n]*\n+'
+    r'(Meny(er)?|Menus?) (uke|week) (?P<weeknum>\d+)[^\n]*\n+'
     r'TRANSIT(,.*?1.*?(etg|etasje|etage))?\n*(?P<first>.*?)\n+'
     r'(EXPEDITIONEN|EXPEDITONEN|EXPEDISJON)(.*?3.*?(etg|etasje|etage))?:?\n*(?P<third>.*)',
     )
