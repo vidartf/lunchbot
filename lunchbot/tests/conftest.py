@@ -37,6 +37,7 @@ known_missing = {
     '160329-first.txt': (0,),
     '160329-third.txt': (0,),
     '170607-combined.txt': (0, 1),
+    '170821-combined.txt': tuple(range(5)),
 }
 
 
