@@ -21,23 +21,23 @@ patterns_first_floor = (r'(Meny|Menu) (uke|week) (?P<weeknum>\d+)\D.*?1.*?(etg|e
 patterns_third_floor = (r'Meny (uke|week) (?P<weeknum>\d+)\D.*?3.*?(etg|etasje|etage)',
     r'(Meny|Menu) Transit (uke|week) (?P<weeknum>\d+):?')
 patterns_combined = (
-    r'(Meny(er)?|Menus?) (uke|week) (?P<weeknum>\d+)[^\n]*\n+'
-    r'GATE 1 & 2 \(TRANSIT,? 1st FLOOR\)\n*(?P<first>.*?)\n+'
-    r'(EXPEDITIONEN|EXPEDITONEN|EXPEDISJON) \(3rd FLOOR\)\n*(?P<third>.*)',
+    r'(Meny(er)?|Menus?) (uke|week) (?P<weeknum>\d+)[^\n]*\s+'
+    r'GATE 1 & 2 \(TRANSIT,? 1st FLOOR\)\n*(?P<first>.*?)\s+'
+    r'(EXPEDITIONEN|EXPEDITONEN|EXPEDISJON) \(3rd FLOOR\)\s*(?P<third>.*)',
 
-    r'(Meny(er)?|Menus?) (uke|week) (?P<weeknum>\d+)[^\n]*\n+'
-    r'TRANSIT(,.*?1.*?(etg|etasje|etage))?\n*(?P<first>.*?)\n+'
-    r'(EXPEDITIONEN|EXPEDITONEN|EXPEDISJON)(.*?3.*?(etg|etasje|etage))?:?\n*(?P<third>.*)',
+    r'(Meny(er)?|Menus?) (uke|week) (?P<weeknum>\d+)[^\n]*\s+'
+    r'TRANSIT(,.*?1.*?(etg|etasje|etage))?\s*(?P<first>.*?)\s+'
+    r'(EXPEDITIONEN|EXPEDITONEN|EXPEDISJON)(.*?3.*?(etg|etasje|etage))?:?\s*(?P<third>.*)',
     )
 floor_flags = re.IGNORECASE
 combined_flags = re.IGNORECASE | re.DOTALL
 
 pattern_days = [
-    r'(MANDAG|MONDAY):?\n?(.*?)\n*(TIRSDAG|TUESDAY|ONSDAG|WEDNESDAY|WENDSDAY|WEDNESAY|TORSDAG|THURSDAY|FREDAG|FRIDAY)|$',
-    r'(TIRSDAG|TUESDAY):?\n?(.*?)\n*(ONSDAG|WEDNESDAY|WENDSDAY"WEDNESAY|TORSDAG|THURSDAY|FREDAG|FRIDAY)|$',
-    r'(ONSDAG|WEDNESDAY|WENDSDAY|WEDNESAY):?\n?(.*?)\n*(TORSDAG|THURSDAY|FREDAG|FRIDAY)|$',
-    r'(TORSDAG|THURSDAY):?\n?(.*?)\n*(FREDAG|FRIDAY)|$',
-    r'(FREDAG|FRIDAY):?\n?(.*?)\n*$'
+    r'(MANDAG|MONDAY):?\s*(.*?)\s*(TIRSDAG|TUESDAY|ONSDAG|WEDNESDAY|WENDSDAY|WEDNESAY|TORSDAG|THURSDAY|FREDAG|FRIDAY)|$',
+    r'(TIRSDAG|TUESDAY):?\s*(.*?)\s*(ONSDAG|WEDNESDAY|WENDSDAY"WEDNESAY|TORSDAG|THURSDAY|FREDAG|FRIDAY)|$',
+    r'(ONSDAG|WEDNESDAY|WENDSDAY|WEDNESAY):?\s*(.*?)\s*(TORSDAG|THURSDAY|FREDAG|FRIDAY)|$',
+    r'(TORSDAG|THURSDAY):?\s*(.*?)\s*(FREDAG|FRIDAY)|$',
+    r'(FREDAG|FRIDAY):?\s*(.*?)\s*$'
 ]
 days_flags = re.IGNORECASE | re.DOTALL
 
