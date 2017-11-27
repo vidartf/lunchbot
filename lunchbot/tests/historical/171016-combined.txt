@@ -1,0 +1,55 @@
+Menyer uke 42
+
+TRANSIT, 1.etg:
+
+Monday
+Oven baked Monkfish
+Bean Salad
+Vegetable Soup
+
+Tuesday
+Asian Pulled Pork
+Bulgur Salad
+Fish Soup
+
+Wednesday
+Home Made Carbonara with Tagiatelle
+Cous-Cous Salad
+Pork broth Soup
+
+Thursday
+Meat Cakes with green pea purè
+Chicken Salad
+Tomato Soup
+
+Friday
+Cheese Burger
+Smoked Salmon salad
+Green Pea Soup
+
+EXPEDISJON, 3.etg:
+
+Monday
+Venison Stew
+Bean Salad with coriander and Lime
+Vegetable Soup
+
+Tuesday
+Swedish “Falukorv” with Mash
+Garlic Soup
+Cous-Cous with chicken and dades
+
+Wednesday
+Lentil Stew with Chickpeas 
+Potatoe Soup
+Asian Cabbage salad
+
+Thursday
+Lamb patties with Cous-Cous and Greek Tomato Sauce
+Chicken broth Soup
+Bulgur Salad with fruits and nuts
+
+Friday
+Herb Chicken with Ratatouille
+Lentil Soup
+Chefs Salad

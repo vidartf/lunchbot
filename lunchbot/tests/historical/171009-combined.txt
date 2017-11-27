@@ -1,0 +1,55 @@
+Meny uke 41
+
+TRANSIT, 1.etg:
+
+Monday
+Chicken with home made Paprika Sauce
+Ham Salad
+Mushroom Soup
+
+Tuesday
+Pollock with onion and potato
+Tuna Salad
+Paprika Soup
+
+Wednesday
+Deer with creamy mushroom sauce
+Carrot and ginger Soup
+Chicken Salad
+
+Thursday
+Beef with potato gratin
+Potato and leek Soup
+Ceasar Salad
+
+Friday
+Chili con Carne with nachos
+Fish Soup
+Mixed Salad
+
+EXPEDISJON, 3.etg
+
+Monday
+Cajun Salmon with Srirachamayo and baked potatoes
+Vegetable Soup
+Pasta salad with Shrimps
+
+Tuesday
+Chicken green curry with rice
+Corn Soup
+Coleslaw
+
+Wednesday
+Meatballs in spicy tomatosauce with pasta
+Paprika Soup
+Greek Tomato Salad
+
+Thursday
+Vegetarian Enchiladas with mushrooms and homemade salsa
+Chick pea Soup
+Bean Salad with mint
+
+Friday
+Satay chicken with rice
+Vegetable Soup
+Grilled Corn Salad
