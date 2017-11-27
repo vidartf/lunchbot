@@ -16,19 +16,43 @@ logger = logging.getLogger('lunchbot')
 # Where to post:
 channels = ['lunch', 'lunchbotdev']
 
+
 patterns_first_floor = (r'(Meny|Menu) (uke|week) (?P<weeknum>\d+)\D.*?1.*?(etg|etasje|etage)',
     r'(Meny|Menu) Expeditionen (uke|week) (?P<weeknum>\d+):?')
 patterns_third_floor = (r'Meny (uke|week) (?P<weeknum>\d+)\D.*?3.*?(etg|etasje|etage)',
     r'(Meny|Menu) Transit (uke|week) (?P<weeknum>\d+):?')
-patterns_combined = (
-    r'(Meny(er)?|Menus?) (uke|week) (?P<weeknum>\d+)[^\n]*\s+'
-    r'GATE 1 & 2 \(TRANSIT,? 1st FLOOR\)\n*(?P<first>.*?)\s+'
-    r'(EXPEDITIONEN|EXPEDITONEN|EXPEDISJON) \(3rd FLOOR\)\s*(?P<third>.*)',
 
-    r'(Meny(er)?|Menus?) (uke|week) (?P<weeknum>\d+)[^\n]*\s+'
-    r'TRANSIT(,.*?1.*?(etg|etasje|etage))?\s*(?P<first>.*?)\s+'
-    r'(EXPEDITIONEN|EXPEDITONEN|EXPEDISJON)(.*?3.*?(etg|etasje|etage))?:?\s*(?P<third>.*)',
+COMBINED_HEADER = r'(Meny(er)?|Menus?) (uke|week) (?P<weeknum>\d+)[^\n]*'
+FIRST_FLOOR_HEADER_A = r'GATE 1 & 2 \(TRANSIT,? 1st FLOOR\):?'
+FIRST_FLOOR_HEADER_B = r'TRANSIT(,.*?1.*?(etg|etasje|etage))?:?'
+THIRD_FLOOR_HEADER_A = r'(EXPEDITIONEN|EXPEDITONEN|EXPEDISJON) \(3rd FLOOR\):?'
+THIRD_FLOOR_HEADER_B = r'(EXPEDITIONEN|EXPEDITONEN|EXPEDISJON)(.*?3.*?(etg|etasje|etage))?:?'
+HEADERS = dict(
+    COMBINED_HEADER=COMBINED_HEADER,
+    FIRST_FLOOR_HEADER_A=FIRST_FLOOR_HEADER_A,
+    FIRST_FLOOR_HEADER_B=FIRST_FLOOR_HEADER_B,
+    THIRD_FLOOR_HEADER_A=THIRD_FLOOR_HEADER_A,
+    THIRD_FLOOR_HEADER_B=THIRD_FLOOR_HEADER_B,
     )
+
+patterns_combined = (
+    r'{COMBINED_HEADER}\s+'
+    r'{FIRST_FLOOR_HEADER_A}\s*(?P<first>.*?)\s+'
+    r'{THIRD_FLOOR_HEADER_A}\s*(?P<third>.*)',
+
+    r'{COMBINED_HEADER}\s+'
+    r'{FIRST_FLOOR_HEADER_B}\s*(?P<first>.*?)\s+'
+    r'{THIRD_FLOOR_HEADER_B}\s*(?P<third>.*)',
+
+    r'{COMBINED_HEADER}\s+'
+    r'{THIRD_FLOOR_HEADER_A}\s*(?P<third>.*?)\s+'
+    r'{FIRST_FLOOR_HEADER_A}\s*(?P<first>.*)',
+
+    r'{COMBINED_HEADER}\s+'
+    r'{THIRD_FLOOR_HEADER_B}\s*(?P<third>.*?)\s+'
+    r'{FIRST_FLOOR_HEADER_B}\s*(?P<first>.*)',
+    )
+patterns_combined = [p.format(**HEADERS) for p in patterns_combined]
 floor_flags = re.IGNORECASE
 combined_flags = re.IGNORECASE | re.DOTALL
 
