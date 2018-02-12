@@ -1,0 +1,54 @@
+Meny uke 6
+
+Transit, 1.etg:
+
+Monday
+Jamaican vegetable soup
+Chicken curry
+Asian fish salad
+
+Tuesday
+Spicy meat soup
+Vegetarian stew
+Pork knuckle salad
+
+Wednesday
+Carrot and ginger soup
+Pot au feu
+Greek salad
+
+Thursday
+Champignon soup
+Salmon Rösti
+Chicken salad
+
+Friday
+Tomato soup
+Pulled pork burger
+Exotic fruit salad
+
+Expedition, 3.etg: 
+
+Monday
+Fetacheese salad
+Chicken legs with pasta pesto and bacon
+Vegetable soup
+
+Tuesday
+Beetroot and spinach salad
+Fish and chips
+Fish-stock soup
+
+Wednesday
+Chicken and olives
+Garlic and herb baked beef
+Onion soup
+
+Thursday
+Seafood salad
+Kebab
+Broccoli-soup
+
+Friday
+Hamburger
+Carrot-soup
