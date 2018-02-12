@@ -120,10 +120,11 @@ def get_menus_for_week(posts, week_number):
                     week_first, week_third = match.group('first', 'third')
                     menu_first_floor = extract_menu(week_first)
                     menu_third_floor = extract_menu(week_third)
-                    break
+                    return menu_first_floor, menu_third_floor
             else:
                 logger.debug('Not a menu for week %d:\n%s', week_number, message)
-        elif menu_first_floor is None and is_matching_message(message, patterns_first_floor, week_number):
+
+        if menu_first_floor is None and is_matching_message(message, patterns_first_floor, week_number):
             logger.info('Found post that matches first floor menu for this week')
             menu_first_floor = extract_menu(message)
         elif menu_third_floor is None and is_matching_message(message, patterns_third_floor, week_number):
