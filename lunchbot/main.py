@@ -17,15 +17,15 @@ logger = logging.getLogger('lunchbot')
 channels = ['lunch', 'lunchbotdev']
 
 
-patterns_first_floor = (r'(Meny|Menu) (uke|week) (?P<weeknum>\d+)(\D|\n).*?1.*?(etg|etasje|etage)',
+patterns_first_floor = (r'(Meny|Menu) (uke|week) (?P<weeknum>\d+)(\D|\n)(.|\n)*?1.*?(etg|etasje|etage)',
     r'(Meny|Menu) Transit (uke|week) (?P<weeknum>\d+):?')
-patterns_third_floor = (r'Meny (uke|week) (?P<weeknum>\d+)(\D|\n).*?3.*?(etg|etasje|etage)',
+patterns_third_floor = (r'Meny (uke|week) (?P<weeknum>\d+)(\D|\n)(.|\n)*?3.*?(etg|etasje|etage)',
     r'(Meny|Menu) Expeditionen (uke|week) (?P<weeknum>\d+):?')
 COMBINED_HEADER = r'(Meny(er)?|Menus?) (uke|week) (?P<weeknum>\d+)[^\n]*'
 FIRST_FLOOR_HEADER_A = r'GATE 1 & 2 \(TRANSIT,? 1st FLOOR\):?'
 FIRST_FLOOR_HEADER_B = r'TRANSIT(,.*?1.*?(etg|etasje|etage))?:?'
-THIRD_FLOOR_HEADER_A = r'(EXPEDITI?ON(EN)?|EXPEDISJON) \(3rd FLOOR\):?'
-THIRD_FLOOR_HEADER_B = r'(EXPEDITI?ON(EN)?|EXPEDISJON)(.*?3.*?(etg|etasje|etage))?:?'
+THIRD_FLOOR_HEADER_A = r'(EXPEDITI?ON(EN)?|EXPEDISJON(EN)?|Ekspedisjon(en)?) \(3rd FLOOR\):?'
+THIRD_FLOOR_HEADER_B = r'(EXPEDITI?ON(EN)?|EXPEDISJON(EN)?|Ekspedisjon(en)?)(.*?3.*?(etg|etasje|etage))?:?'
 HEADERS = dict(
     COMBINED_HEADER=COMBINED_HEADER,
     FIRST_FLOOR_HEADER_A=FIRST_FLOOR_HEADER_A,
