@@ -39,3 +39,10 @@ def test_third_floor_match(historical_third_floor):
 def test_combined_match(historical_combined):
     week_num, message = historical_combined
     assert is_matching_message(message, patterns_combined, week_num, combined_flags)
+
+
+def test_menus_for_week(historical_cumulative_raw, request):
+    weeknum, expected, posts = historical_cumulative_raw
+    result = get_menus_for_week(posts, weeknum)
+    assert (result[0] is not None) == expected[0]
+    assert (result[1] is not None) == expected[1]
