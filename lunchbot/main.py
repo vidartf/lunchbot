@@ -135,6 +135,8 @@ def get_menus_for_week(posts, week_number):
 
         if menu_first_floor is not None and menu_third_floor is not None:
             break
+    else:
+        logger.warning('No posts to process!')
     return menu_first_floor, menu_third_floor
 
 
