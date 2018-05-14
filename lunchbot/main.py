@@ -122,7 +122,7 @@ def get_menus_for_week(posts, week_number):
                     menu_third_floor = extract_menu(week_third)
                     return menu_first_floor, menu_third_floor
             else:
-                logger.debug('Not a menu for week %d:\n%s', week_number, message)
+                logger.debug('Not a combined menu for week %d:\n%s', week_number, message)
 
         if menu_first_floor is None and is_matching_message(message, patterns_first_floor, week_number):
             logger.info('Found post that matches first floor menu for this week')
