@@ -14,17 +14,33 @@ from lunchbot.main import (
 pattern_daynames = re.compile(r'MANDAG|TIRSDAG|ONSDAG|TORSDAG|FREDAG|MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY')
 
 
+
+def split_combined(message):
+    for pattern in patterns_combined:
+        match = re.match(pattern, message, flags=combined_flags)
+        if match is not None:
+            return match.group('first', 'third')
+
+    return [message]
+
+
 def test_extract_menu(historical):
     message, known_missing = historical
-    menu = extract_menu(message)
-    for day, entry in enumerate(menu):
-        if known_missing and day in known_missing:
-            # Skip days that we know were not included in menus
+    if known_missing and not isinstance(known_missing, list):
+        known_missing = [known_missing, known_missing]
+    raws = split_combined(message)
+    for i, raw in enumerate(raws):
+        if raw is None:
             continue
-        # Assert that the menu was found
-        assert entry is not None, "No menu entry found for day %d" % day
-        # Assert that there was no "bleedover" between days
-        assert not re.match(pattern_daynames, entry)
+        menu = extract_menu(raw)
+        for day, entry in enumerate(menu):
+            if known_missing and day in known_missing[i]:
+                # Skip days that we know were not included in menus
+                continue
+            # Assert that the menu was found
+            assert entry is not None, "No menu entry found for day %d" % day
+            # Assert that there was no "bleedover" between days
+            assert not re.match(pattern_daynames, entry)
 
 
 def test_first_floor_match(historical_first_floor):

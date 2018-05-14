@@ -1,0 +1,55 @@
+Meny uke 16
+
+Transit, 1.etg:
+
+Monday:
+Tuna potato salad
+Corn soup
+Jerk chicken
+
+Tuesday:
+Sausage and lentil salad
+Tomato soup
+Vegetarian stew
+
+Wednesday:
+Cauliflower salad
+Pea soup
+Baked salmon
+
+Thursday:
+Roastbeef salad
+Mushroom soup
+Wild boar casserole
+
+Friday:
+Fruit salad
+Fish soup
+Lamb kebab
+
+Expedisjonen, 3.etg:
+
+Monday
+Hot dish: Swiss cheese schnitzel with potatoes.
+Salad: Fig salad & mozzarella salad.
+Soup: Cauliflower soup.
+
+Tuesday
+Hot dish: Pork neck with tomato risotto.
+Salad: Egg and Shrimp salad.
+Soup: Corn and garlic soup.
+
+Wednesday
+Hot dish: Creamy fish casserole with saffron rice.
+Salad: Blue cheese salad.
+Soup: Fennel soup.
+
+Thursday
+Hot dish: Slow cooked beef with five pepper sauce and potatoes.
+Salad: Potato salad with bacon.
+Soup: Tomato soup.
+
+Friday
+Hot dish: Lamb meatballs in herb sauce, served with couscous.
+Salad:  Cottage cheese salad with cherry tomatoes and basil.
+Soup: Fish and mushroom soup

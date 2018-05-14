@@ -40,6 +40,10 @@ known_missing = {
     '170607-combined.txt': (0, 1),
     '170821-combined.txt': tuple(range(5)),
     '180103-combined.txt': (0, 1),
+    '180122-combined.txt': [(), (0,)],
+    '180212-combined.txt': [(), (0,)],
+    '180403-combined.txt': [(0,), (0, 1)],
+    '180514-combined.txt': [(3, 4), ()],
 }
 
 

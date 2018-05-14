@@ -1,0 +1,55 @@
+Meny uke 12
+
+Transit, 1.etg:
+
+Monday:
+Pasta salad with pepper salmon
+Spicy  chicken with rice
+Fish soup
+
+Tuesday:
+Potato salad with sausage
+Vegetarian stew
+Chicken soup
+
+Wednesday:
+Vegetarian ebly salad
+Ox-tail stew
+Tomato soup
+
+Thursday:
+Cesar salad
+Baked salmon
+Mushroom soup
+
+Friday:
+Fruit salad
+Burgers
+Cauliflower soup
+
+Expedition, 3.etgt:
+
+Monday
+Hot dish: Salsiccia with lentils and tomatoes.
+Salad: Smoked salmon salad with avocado.
+Soup: Lentil soup.
+
+Tuesday
+Hot dish: Karbonade med brunsaus og potet
+Salad: Chevre salad with Serrano ham.
+Soup: Broccoli soup.
+
+Wednesday
+Hot dish: Slow baked lamb with potatoes and red wine sauce.
+Salad: Spicy Chicken salad
+Soup: Chicken stock soup.
+
+Thursday
+Hot dish: Lighter Taco, with Mango salsa, and Avocado-dressing.
+Salad: Ham-salad with strawberry and melon.
+Soup: Tomato soup.
+
+Friday
+Hot dish: Chipotle Spareribs with potatoes and Chili Coleslaw.
+Salad: Greek salad with feta cheese.
+Soup: Vegetable soup.
