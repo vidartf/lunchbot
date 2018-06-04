@@ -151,6 +151,10 @@ def is_matching_message(message, floor_patterns, week_number, flags=None):
     return False
 
 
+def trim_multiline(text):
+    return '\n'.join(line.strip() for line in text.splitlines())
+
+
 def extract_menu(message):
     """Extract the menu from a message"""
     menu = [None] * 5
@@ -159,7 +163,7 @@ def extract_menu(message):
         if match and match.group(2):
             logger.info('Found menu for day %d', day)
             logger.debug(match.groups())
-            menu[day] = match.group(2)
+            menu[day] = trim_multiline(match.group(2))
         else:
             logger.warning('Could not find menu for day %d.', day)
             if match:
