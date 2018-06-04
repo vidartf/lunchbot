@@ -44,6 +44,7 @@ known_missing = {
     '180212-combined.txt': [(), (0,)],
     '180403-combined.txt': [(0,), (0, 1)],
     '180514-combined.txt': [(3, 4), ()],
+    '180522-combined.txt': [(0,), (0, 1)],
 }
 
 
