@@ -21,7 +21,7 @@ patterns_first_floor = (r'(Meny|Menu) (uke|week) (?P<weeknum>\d+)(\D|\n)(.|\n)*?
     r'(Meny|Menu) Transit (uke|week) (?P<weeknum>\d+):?')
 patterns_third_floor = (r'Meny (uke|week) (?P<weeknum>\d+)(\D|\n)(.|\n)*?3.*?(etg|etasje|etage)',
     r'(Meny|Menu) Expeditionen (uke|week) (?P<weeknum>\d+):?')
-COMBINED_HEADER = r'(Meny(er)?|Menus?) (uke|week) (?P<weeknum>\d+)[^\n]*'
+COMBINED_HEADER = r'((Meny(er)?|Menus?) (uke|week)|Week|Uke) (?P<weeknum>\d+)[^\n]*'
 FIRST_FLOOR_HEADER_A = r'GATE 1 & 2 \(TRANSIT,? 1st FLOOR\):?'
 FIRST_FLOOR_HEADER_B = r'TRANSIT(,.*?1.*?(etg|etasje|etage))?:?'
 THIRD_FLOOR_HEADER_A = r'(EXPEDITI?ON(EN)?|EXPEDISJON(EN)?|Ekspedisjon(en)?) \(3rd FLOOR\):?'
