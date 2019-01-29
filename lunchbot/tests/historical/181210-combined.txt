@@ -1,0 +1,42 @@
+Meny uke 50
+
+Transit, 1.etg:
+
+Tuesday:
+Tomato mozzarella
+Tomato soup
+Chicken with roasted potatoes
+
+Wednesday:
+Kyllingsalat
+Mushroom soup
+Crisp cod with roast potatoes
+
+Thursday:
+Asian fish salad
+Asparagus soup
+Turkey curry
+
+Friday:
+Exotic fruit salad
+Chicken soup
+Pizza
+
+Expedisjon, 3.etg:
+
+Tuesday:        Salmon fillet with boiled potatoes and cucumber
+                         Rice noodles whit chicken                        
+                        Greek salad
+                        Today's soup
+Wednesday: vegetables chopsuey with scampi
+                       Chicken Satay
+                       Mediterranean Half Salad
+                       Chef's day soup
+Thursday:     Cod and salmon with rice
+                        Beef in a spicy tomatoes saus 
+                       Couscous salad
+                       Today's soup
+ Friday:       Tagliatelles Bolognese
+                    Waffles today
+                    surprise me
+                    Today's soup

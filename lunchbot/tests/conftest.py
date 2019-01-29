@@ -27,6 +27,8 @@ weeknum_override = {
     '160122-third.txt': (2016, 4),
     '160108-first.txt': (2016, 2),
     '160108-third.txt': (2016, 2),
+    '180622-combined.txt': (2018, 26),
+    '190104-combined.txt': (2019, 2),
 }
 
 # Days that are known to be missing from menus:
@@ -40,11 +42,20 @@ known_missing = {
     '170607-combined.txt': (0, 1),
     '170821-combined.txt': tuple(range(5)),
     '180103-combined.txt': (0, 1),
+    # List of tuples: missing days, [(first floor), (third floor)]
     '180122-combined.txt': [(), (0,)],
     '180212-combined.txt': [(), (0,)],
     '180403-combined.txt': [(0,), (0, 1)],
     '180514-combined.txt': [(3, 4), ()],
     '180522-combined.txt': [(0,), (0, 1)],
+    '180604-combined.txt': [(0, 1), ()],
+    '180611-combined.txt': [(), (0, 1)],
+    '180622-combined.txt': (0, 1, 2, 3),
+    '180813-combined.txt': (0, 1, 2),
+    '180827-combined.txt': (0,),
+    '181210-combined.txt': (0,),
+    '181217-combined.txt': (0, 1, 2, 3),
+    '190102-combined.txt': (0, 1),
 }
 
 
