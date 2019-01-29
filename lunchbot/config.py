@@ -16,7 +16,7 @@ parser.add_argument("-v", "--verbose", help="increase output verbosity",
 
 
 here = os.path.abspath(os.path.dirname(__file__))
-config = configparser.SafeConfigParser()
+config = configparser.ConfigParser()
 files = config.read([
     './lunchbot.ini',
     os.path.join(here, 'lunchbot.ini'),
