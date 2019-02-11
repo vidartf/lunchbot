@@ -4,30 +4,38 @@
 from __future__ import print_function, unicode_literals
 
 import re
+import collections
 import datetime
+import locale
 import logging
+from pytz import timezone
 
 from .config import config, parser, SLACK_TOKEN, FACEBOOK_SECRET, FACEBOOK_ID
 from .apiwrappers import authenticated_graph, filter_messages, SlackPoster
 
 
 logger = logging.getLogger('lunchbot')
+locale.setlocale(locale.LC_ALL, "no_NO")
 
 # Where to post:
 channels = ['lunch', 'lunchbotdev']
 
 
-patterns_first_floor = (r'(Meny|Menu) (uke|week) (?P<weeknum>\d+)(\D|\n)(.|\n)*?1.*?(etg|etasje|etage)',
+patterns_first_floor = (r'(Meny|Menu) (uke|week) (?P<weeknum>\d+)(\D|\n)(.|\n)*?1.*?(etg|etasje|etage):?',
     r'(Meny|Menu) Transit (uke|week) (?P<weeknum>\d+):?')
-patterns_third_floor = (r'Meny (uke|week) (?P<weeknum>\d+)(\D|\n)(.|\n)*?3.*?(etg|etasje|etage)',
+patterns_third_floor = (r'Meny (uke|week) (?P<weeknum>\d+)(\D|\n)(.|\n)*?3.*?(etg|etasje|etage):?',
     r'(Meny|Menu) Expeditionen (uke|week) (?P<weeknum>\d+):?')
 COMBINED_HEADER = r'((Meny(er)?|Menus?) (uke|week)|Week|Uke) (?P<weeknum>\d+)[^\n]*'
 FIRST_FLOOR_HEADER_A = r'GATE 1 & 2 \(TRANSIT,? 1st FLOOR\):?'
-FIRST_FLOOR_HEADER_B = r'TRANSIT(,.*?1.*?(etg|etasje|etage))?:?'
+FIRST_FLOOR_HEADER_B = r'TRANSIT(.*?1.*?(etg|etasje|etage))?:?'
 THIRD_FLOOR_HEADER_A = r'(EXPEDITI?ON(EN)?|EXPEDISJON(EN)?|Ekspedisjon(en)?) \(3rd FLOOR\):?'
 THIRD_FLOOR_HEADER_B = r'(EXPEDITI?ON(EN)?|EXPEDISJON(EN)?|Ekspedisjon(en)?)(.*?3.*?(etg|etasje|etage))?:?'
+
+COMBINED_DAILY_HEADER = r'(Meny(er)?|Menus?) (?P<weekday>\w+)?\s?((?P<day>\d+)\.?)\s?(?P<month>\w+)[^\n]*'
+
 HEADERS = dict(
     COMBINED_HEADER=COMBINED_HEADER,
+    COMBINED_DAILY_HEADER=COMBINED_DAILY_HEADER,
     FIRST_FLOOR_HEADER_A=FIRST_FLOOR_HEADER_A,
     FIRST_FLOOR_HEADER_B=FIRST_FLOOR_HEADER_B,
     THIRD_FLOOR_HEADER_A=THIRD_FLOOR_HEADER_A,
@@ -55,6 +63,25 @@ patterns_combined = [p.format(**HEADERS) for p in patterns_combined]
 floor_flags = re.IGNORECASE
 combined_flags = re.IGNORECASE | re.DOTALL
 
+patterns_daily_combined = (
+    r'{COMBINED_DAILY_HEADER}\s+'
+    r'{FIRST_FLOOR_HEADER_A}\s*(?P<first>.*?)\s+'
+    r'{THIRD_FLOOR_HEADER_A}\s*(?P<third>.*)',
+
+    r'{COMBINED_DAILY_HEADER}\s+'
+    r'{FIRST_FLOOR_HEADER_B}\s*(?P<first>.*?)\s+'
+    r'{THIRD_FLOOR_HEADER_B}\s*(?P<third>.*)',
+
+    r'{COMBINED_DAILY_HEADER}\s+'
+    r'{THIRD_FLOOR_HEADER_A}\s*(?P<third>.*?)\s+'
+    r'{FIRST_FLOOR_HEADER_A}\s*(?P<first>.*)',
+
+    r'{COMBINED_DAILY_HEADER}\s+'
+    r'{THIRD_FLOOR_HEADER_B}\s*(?P<third>.*?)\s+'
+    r'{FIRST_FLOOR_HEADER_B}\s*(?P<first>.*)',
+)
+patterns_daily_combined = [p.format(**HEADERS) for p in patterns_daily_combined]
+
 pattern_days = [
     r'(MANDAG|MONDAY):?\s*(.*?)\s*\n\s*(TIRSDAG|TUESDAY|ONSDAG|WEDNESDAY|WENDSDAY|WEDNESAY|TORSDAG|THURSDAY|FREDAG|FRIDAY)|$',
     r'(TIRSDAG|TUESDAY):?\s*(.*?)\s*\n\s*(ONSDAG|WEDNESDAY|WENDSDAY"WEDNESAY|TORSDAG|THURSDAY|FREDAG|FRIDAY)|$',
@@ -63,6 +90,9 @@ pattern_days = [
     r'(FREDAG|FRIDAY):?\s*(.*?)\s*$'
 ]
 days_flags = re.IGNORECASE | re.DOTALL
+
+
+Menu = collections.namedtuple('Menu', ('first', 'third'), defaults=(None, None))
 
 
 def run(post_menu=None):
@@ -75,8 +105,7 @@ def run(post_menu=None):
         sp = SlackPoster(SLACK_TOKEN, channels)
         post_menu = sp.post
 
-    menu_first_floor = None
-    menu_third_floor = None
+    menu = None
 
     try:
         logger.info('Initializing Facebook graph API...')
@@ -85,23 +114,80 @@ def run(post_menu=None):
         logger.info('Getting facebook posts...')
         posts = graph.get('technopolisitfornebu/posts')
 
-        week_number = datetime.datetime.today().isocalendar()[1]
-        menu_first_floor, menu_third_floor = get_menus_for_week(
-            filter_messages(posts),
-            week_number
-        )
-
+        menu = get_menus(posts, datetime.datetime.now(timezone('Europe/Oslo')))
     finally:
-        day = datetime.datetime.today().weekday()
-        if day < 5:
-            if menu_first_floor and menu_first_floor[day]:
-                post_menu('*First floor menu:*\n' + menu_first_floor[day])
-            else:
-                post_menu('_Could not find a menu for the first floor today_ :disappointed:')
-            if menu_third_floor and menu_third_floor[day]:
-                post_menu('*Third floor menu:*\n' + menu_third_floor[day])
-            else:
-                post_menu('_Could not find a menu for the third floor today_ :disappointed:')
+        if menu.first:
+            post_menu('*First floor menu:*\n' + menu.first)
+        else:
+            post_menu('_Could not find a menu for the first floor today_ :disappointed:')
+        if menu.third:
+            post_menu('*Third floor menu:*\n' + menu.third)
+        else:
+            post_menu('_Could not find a menu for the third floor today_ :disappointed:')
+
+
+def filter_msg_distance(posts, ref, days):
+    """Filter any message by distance from a reference"""
+    for post in posts:
+        msg_dt = datetime.datetime.strptime(
+            post['created_time'],
+            '%Y-%m-%dT%H:%M:%S%z'
+        )
+        if abs(msg_dt - ref).days <= days:
+            yield post
+
+
+def localized_month(monthstr):
+  return datetime.datetime.strptime(monthstr, "%B").month
+
+
+def get_menus(posts, date):
+    """Get the menu for the given date."""
+    # First, try daily menu:
+    menu = get_menus_for_day(posts, date)
+    if menu:
+        return menu
+
+    # Then, check for weekly menu
+    week_number = date.isocalendar()[1]
+    menu_first_floor, menu_third_floor = get_menus_for_week(
+        filter_messages(posts),
+        week_number
+    )
+    if menu_first_floor or menu_third_floor:
+        weekday = date.weekday()
+        menus = [None, None]
+        if weekday < 5:
+            if menu_first_floor and menu_first_floor[weekday]:
+                menus[0] = menu_first_floor[weekday]
+            if menu_third_floor and menu_third_floor[weekday]:
+                menus[1] = menu_third_floor[weekday]
+        return Menu(menus)
+
+    return Menu()
+
+
+def get_menus_for_day(posts, date):
+    """Get the menu for the given date matching daily menu."""
+    # First, try daily menu:
+    day = date.day
+    month = date.month
+    year = date.year
+
+    for post in filter_msg_distance(filter_messages(posts), date, 10):
+        message = post['message']
+        for pattern in patterns_daily_combined:
+            match = re.match(pattern, message, flags=combined_flags)
+            if (match is not None
+                and localized_month(match.group('month')) == month
+                and int(match.group('day')) == day
+            ):
+                logger.info('Found post that matches a combined menu for this day')
+                logger.debug(message)
+                first, third = match.group('first', 'third')
+                return Menu(trim_multiline(first), trim_multiline(third))
+
+    return None
 
 
 def get_menus_for_week(posts, week_number):

@@ -35,7 +35,8 @@ setup_args = dict(
 setuptools_args = {}
 setuptools_args['install_requires'] = [
     'facepy',
-    'slackclient'
+    'slackclient',
+    'pytz'
 ]
 
 extras_require = setuptools_args['extras_require'] = {

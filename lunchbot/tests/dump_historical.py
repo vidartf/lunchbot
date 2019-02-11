@@ -10,7 +10,14 @@ from dateutil.parser import parse
 
 from ..config import FACEBOOK_SECRET, FACEBOOK_ID
 from ..apiwrappers import authenticated_graph, filter_messages
-from ..main import patterns_first_floor, patterns_third_floor, patterns_combined, floor_flags, combined_flags
+from ..main import (
+    patterns_first_floor,
+    patterns_third_floor,
+    patterns_combined,
+    floor_flags,
+    combined_flags,
+    patterns_daily_combined
+)
 
 
 here = os.path.abspath(os.path.dirname(__file__))
@@ -45,3 +52,5 @@ for posts in pages:
             dump_menu(post, 'first')
         elif is_menu_message(message, patterns_third_floor):
             dump_menu(post, 'third')
+        elif is_menu_message(message, patterns_daily_combined, combined_flags):
+            dump_menu(post, 'dailycomb')

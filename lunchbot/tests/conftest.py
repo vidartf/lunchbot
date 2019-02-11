@@ -4,13 +4,14 @@
 import io
 import os
 import glob
-from datetime import datetime
+from datetime import datetime, date
 from collections import defaultdict
 try:
     from functools import lru_cache
 except ImportError:
     from backports.functools_lru_cache import lru_cache
 
+from pytz import timezone
 import pytest
 
 here = os.path.abspath(os.path.dirname(__file__))
@@ -58,6 +59,10 @@ known_missing = {
     '190102-combined.txt': (0, 1),
 }
 
+date_override = {
+    '180503-dailycomb.txt': (2018, 5, 4),
+}
+
 
 @lru_cache(256)
 def get_file(path):
@@ -89,9 +94,21 @@ def _combined():
         if fn.endswith('-combined.txt'):
             yield fn
 
+def _historical_weekly():
+    for fn in _historical():
+        if not fn.endswith('-dailycomb.txt'):
+            yield fn
+
+def _daily_combined():
+    for fn in _historical():
+        if fn.endswith('-dailycomb.txt'):
+            yield fn
+
 def _weeks():
     lut = defaultdict(list)
     for fn in _historical():
+        if fn.endswith('-dailycomb.txt'):
+            continue
         year_week = _extract_year_weeknum(fn)
         lut[year_week].append(fn)
         assert len(lut[year_week]) <= 2
@@ -113,11 +130,19 @@ def _extract_year_weeknum(path):
 def _extract_week_num(path):
     return _extract_year_weeknum(path)[1]
 
+def _extract_date(path):
+    filename = os.path.basename(path)
+    if filename in date_override:
+        return datetime(*date_override[filename], tzinfo=timezone('Europe/Oslo'))
+    filename = os.path.splitext(filename)[0]
+    d = datetime.strptime(filename.split('-')[0], '%y%m%d')
+    return d.replace(tzinfo=timezone('Europe/Oslo'))
+
 
 WEEKS = _weeks()
 
-@pytest.fixture(params=_historical())
-def historical(request):
+@pytest.fixture(params=_historical_weekly())
+def historical_weekly(request):
     path = request.param
     filename = os.path.basename(path)
     missing = known_missing.get(filename)
@@ -145,15 +170,21 @@ def historical_combined(request):
     return week_num, get_file(path)
 
 
+@pytest.fixture(params=_daily_combined())
+def historical_daily_post(request):
+    path = request.param
+    d = _extract_date(path)
+    return d, _make_post(path)
+
+
 def _make_post(path):
     message = get_file(path)
-    filename = os.path.splitext(os.path.basename(path))[0]
-    d = datetime.strptime(filename.split('-')[0], '%y%m%d')
-    return dict(message=message, created_time=d.isoformat())
+    d = _extract_date(path)
+    return dict(message=message, created_time=d.strftime('%Y-%m-%dT%H:%M:%S%z'))
 
 
-@pytest.fixture(params=_historical())
-def historical_cumulative_raw(request):
+@pytest.fixture(params=_historical_weekly())
+def historical_weekly_raw(request):
     path = request.param
     year_week = _extract_year_weeknum(path)
     files = WEEKS[year_week]
