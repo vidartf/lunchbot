@@ -92,7 +92,7 @@ pattern_days = [
 days_flags = re.IGNORECASE | re.DOTALL
 
 
-Menu = collections.namedtuple('Menu', ('first', 'third'), defaults=(None, None))
+Menu = collections.namedtuple('Menu', ('first', 'third'))
 
 
 def run(post_menu=None):
@@ -105,7 +105,7 @@ def run(post_menu=None):
         sp = SlackPoster(SLACK_TOKEN, channels)
         post_menu = sp.post
 
-    menu = None
+    menu = Menu(None, None)
 
     try:
         logger.info('Initializing Facebook graph API...')
@@ -138,7 +138,10 @@ def filter_msg_distance(posts, ref, days):
 
 
 def localized_month(monthstr):
-  return datetime.datetime.strptime(monthstr, "%B").month
+    try:
+        return datetime.datetime.strptime(monthstr, "%B").month
+    except ValueError:
+        return None
 
 
 def get_menus(posts, date):
@@ -154,17 +157,16 @@ def get_menus(posts, date):
         filter_messages(posts),
         week_number
     )
+    menus = [None, None]
     if menu_first_floor or menu_third_floor:
         weekday = date.weekday()
-        menus = [None, None]
         if weekday < 5:
             if menu_first_floor and menu_first_floor[weekday]:
                 menus[0] = menu_first_floor[weekday]
             if menu_third_floor and menu_third_floor[weekday]:
                 menus[1] = menu_third_floor[weekday]
-        return Menu(menus)
 
-    return Menu()
+    return Menu(*menus)
 
 
 def get_menus_for_day(posts, date):
