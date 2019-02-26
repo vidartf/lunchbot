@@ -83,10 +83,10 @@ patterns_daily_combined = (
 patterns_daily_combined = [p.format(**HEADERS) for p in patterns_daily_combined]
 
 pattern_days = [
-    r'(MANDAG|MONDAY):?\s*(.*?)\s*\n\s*(TIRSDAG|TUESDAY|ONSDAG|WEDNESDAY|WENDSDAY|WEDNESAY|TORSDAG|THURSDAY|FREDAG|FRIDAY)|$',
-    r'(TIRSDAG|TUESDAY):?\s*(.*?)\s*\n\s*(ONSDAG|WEDNESDAY|WENDSDAY"WEDNESAY|TORSDAG|THURSDAY|FREDAG|FRIDAY)|$',
-    r'(ONSDAG|WEDNESDAY|WENDSDAY|WEDNESAY):?\s*(.*?)\s*\n\s*(TORSDAG|THURSDAY|FREDAG|FRIDAY)|$',
-    r'(TORSDAG|THURSDAY):?\s*(.*?)\s*\n\s*(FREDAG|FRIDAY)|$',
+    r'(MANDAG|MONDAY):?\s*(.*?)\s*\n\s*([^\n]*(TIRSDAG|TUESDAY|ONSDAG|WEDNESDAY|WENDSDAY|WEDNESAY|TORSDAG|THURSDAY|FREDAG|FRIDAY))|$',
+    r'(TIRSDAG|TUESDAY):?\s*(.*?)\s*\n\s*([^\n]*(ONSDAG|WEDNESDAY|WENDSDAY"WEDNESAY|TORSDAG|THURSDAY|FREDAG|FRIDAY))|$',
+    r'(ONSDAG|WEDNESDAY|WENDSDAY|WEDNESAY):?\s*(.*?)\s*\n\s*([^\n]*(TORSDAG|THURSDAY|FREDAG|FRIDAY))|$',
+    r'(TORSDAG|THURSDAY):?\s*(.*?)\s*\n\s*[^\n]*((FREDAG|FRIDAY))|$',
     r'(FREDAG|FRIDAY):?\s*(.*?)\s*$'
 ]
 days_flags = re.IGNORECASE | re.DOTALL

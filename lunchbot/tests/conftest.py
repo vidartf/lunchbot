@@ -58,6 +58,7 @@ known_missing = {
     '181217-combined.txt': (0, 1, 2, 3),
     '190102-combined.txt': (0, 1),
     '190211-combined.txt': (0, 1),
+    '190218-combined.txt': (0,),
 }
 
 date_override = {
