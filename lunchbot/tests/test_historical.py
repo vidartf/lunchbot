@@ -17,17 +17,12 @@ from lunchbot.main import (
     combined_flags
 )
 
+from lunchbot.use_historical import (
+    split_combined
+)
+
 pattern_daynames = re.compile(r'MANDAG|TIRSDAG|ONSDAG|TORSDAG|FREDAG|MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY')
 
-
-
-def split_combined(message):
-    for pattern in patterns_combined:
-        match = re.match(pattern, message, flags=combined_flags)
-        if match is not None:
-            return match.group('first', 'third')
-
-    return [message]
 
 
 def test_extract_menu(historical_weekly):
