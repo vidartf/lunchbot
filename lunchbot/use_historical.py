@@ -178,5 +178,5 @@ def iter_menus():
             for day_num, daily in enumerate(extract_menu(floor_menu)):
                 if daily is None:
                     continue
-                dt = _iso_to_gregorian(year, weeknum, day_num)
-                yield Entry(menu=daily, date=dt.date(), floor=floor_names[floor])
+                d = _iso_to_gregorian(year, weeknum, day_num)
+                yield Entry(menu=daily, date=d, floor=floor_names[floor])
