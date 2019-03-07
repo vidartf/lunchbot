@@ -28,8 +28,8 @@ patterns_third_floor = (r'Meny (uke|week) (?P<weeknum>\d+)(\D|\n)(.|\n)*?3.*?(et
 COMBINED_HEADER = r'((Meny(er)?|Menus?) (uke|week)|Week|Uke) (?P<weeknum>\d+)[^\n]*'
 FIRST_FLOOR_HEADER_A = r'GATE 1 & 2 \(TRANSIT,? 1st FLOOR\):?'
 FIRST_FLOOR_HEADER_B = r'TRANSIT(.*?1.*?(etg|etasje|etage))?:?'
-THIRD_FLOOR_HEADER_A = r'(EXPEDITI?ON(EN)?|EXPEDISJON(EN)?|Ekspedisjon(en)?) \(3rd FLOOR\):?'
-THIRD_FLOOR_HEADER_B = r'(EXPEDITI?ON(EN)?|EXPEDISJON(EN)?|Ekspedisjon(en)?)(.*?3.*?(etg|etasje|etage))?:?'
+THIRD_FLOOR_HEADER_A = r'[^\n]*(EXPEDITI?ON(EN)?|EXPEDISJON(EN)?|Ekspedisjon(en)?) \(3rd FLOOR\):?'
+THIRD_FLOOR_HEADER_B = r'[^\n]*(EXPEDITI?ON(EN)?|EXPEDISJON(EN)?|Ekspedisjon(en)?)(.*?3.*?(etg|etasje|etage))?:?'
 
 COMBINED_DAILY_HEADER = r'(Meny(er)?|Menus?) (?P<weekday>\w+)?\s?((?P<day>\d+)\.?)\s?(?P<month>\w+)[^\n]*'
 

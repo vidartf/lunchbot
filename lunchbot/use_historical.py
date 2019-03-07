@@ -41,6 +41,7 @@ known_missing = {
     '161108-third.txt': (0,),
     '161115-third.txt': (0,),
     '161122-third.txt': (0,),
+    '161216-third.txt': (4,),
     '160329-first.txt': (0,),
     '160329-third.txt': (0,),
     '170607-combined.txt': (0, 1),
@@ -167,16 +168,29 @@ def split_combined(message):
 
     return [message]
 
+def is_missing(path, floornum, daynum):
+    entry = known_missing.get(os.path.basename(path), None)
+    if not entry:
+        return False
+    if not isinstance(entry, list):
+        entry = [entry, entry]
+    return daynum in entry[floornum]
+
+invalid_entry_cutoff = date(2016, 7, 1)
+
 Entry = namedtuple('Entry', ('menu', 'date', 'floor'))
 
 def iter_menus():
     floor_names = ['first', 'third']
     for fn in historical_weekly():
+        if fn.endswith('190114-first.txt'):
+            continue
         week_menu = get_file(fn)
         year, weeknum = extract_year_weeknum(fn)
         for floor, floor_menu in enumerate(split_combined(week_menu)):
             for day_num, daily in enumerate(extract_menu(floor_menu)):
-                if daily is None:
+                if daily is None or is_missing(fn, floor, day_num):
                     continue
                 d = _iso_to_gregorian(year, weeknum, day_num)
-                yield Entry(menu=daily, date=d, floor=floor_names[floor])
+                if d > invalid_entry_cutoff:
+                    yield Entry(menu=daily, date=d, floor=floor_names[floor])
