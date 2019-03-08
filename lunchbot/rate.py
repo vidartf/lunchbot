@@ -30,6 +30,13 @@ def _connect():
             PRIMARY KEY(a, b)
         ) WITHOUT ROWID;
     ''')
+    _db.execute('''
+        CREATE TABLE IF NOT EXISTS
+        rating (
+            id INTEGER PRIMARY KEY,
+            rating INTEGER
+        ) WITHOUT ROWID;
+    ''')
 
 epoch = date(2010, 1, 1)
 
@@ -54,7 +61,7 @@ def prompt_comparison(a, b):
     prev = _previous(a, b)
     if prev is not None:
         return prev
-    print('Choose the best menu:')
+    print('Choose the best menu:') 
     print('=' * 60)
     print(a.menu)
     print('-' * 60)
@@ -87,12 +94,49 @@ def prompt_sort(entries):
     return _sort_menus(entries)
 
 
+def get_rate(entry):
+    rows = _db.execute('''
+        SELECT id, rating
+        FROM rating
+        WHERE id = ?
+        LIMIT 1
+    ''', (_dbkey(entry),))
+    for r in rows:
+        return r[1]
+    return None
+
+def rate(entry):
+    prev = get_rate(entry)
+    if prev is not None:
+        return prev
+    print('Rate the menu:')
+    print(entry.menu)
+    print('-' * 60)
+    res = 0
+    while True:
+        reply = input('[0-100]:')
+        try:
+            res = int(reply)
+            break
+        except ValueError:
+            pass
+    _db.execute('''
+        INSERT INTO rating (id, rating)
+        VALUES (?, ?)
+    ''', (_dbkey(entry), res))
+    return res
+
+
 if __name__ == '__main__':
     from .main import logger
     logger.setLevel('ERROR')
     _connect()
     try:
-        print(prompt_sort(iter_menus()))
+        for e in iter_menus():
+            rate(e)
+        print('All menus are rated!')
+    except KeyboardInterrupt:
+        pass
     finally:
         _db.commit()
         _db.close()
