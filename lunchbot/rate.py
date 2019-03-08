@@ -95,6 +95,8 @@ def prompt_sort(entries):
 
 
 def get_rate(entry):
+    if _db is None:
+        _connect()
     rows = _db.execute('''
         SELECT id, rating
         FROM rating
