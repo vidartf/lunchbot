@@ -105,11 +105,12 @@ def get_rate(entry):
         return r[1]
     return None
 
-def rate(entry):
+def rate(entry, num=None):
     prev = get_rate(entry)
     if prev is not None:
         return prev
-    print('Rate the menu:')
+    add = ' (#%d)' % i if num is not None else ''
+    print('Rate the menu%s:' % add)
     print(entry.menu)
     print('-' * 60)
     res = 0
@@ -132,8 +133,8 @@ if __name__ == '__main__':
     logger.setLevel('ERROR')
     _connect()
     try:
-        for e in iter_menus():
-            rate(e)
+        for i, e in enumerate(iter_menus()):
+            rate(e, i)
         print('All menus are rated!')
     except KeyboardInterrupt:
         pass
