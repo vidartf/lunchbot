@@ -15,7 +15,7 @@ from .apiwrappers import authenticated_graph, filter_messages, SlackPoster
 
 
 logger = logging.getLogger('lunchbot')
-locale.setlocale(locale.LC_ALL, "no_NO")
+locale.setlocale(locale.LC_ALL, "nb_NO.utf8")
 
 # Where to post:
 channels = ['lunch', 'lunchbotdev']
@@ -27,7 +27,7 @@ patterns_third_floor = (r'Meny (uke|week) (?P<weeknum>\d+)(\D|\n)(.|\n)*?3.*?(et
     r'(Meny|Menu) Expeditionen (uke|week) (?P<weeknum>\d+):?')
 COMBINED_HEADER = r'((Meny(er)?|Menus?) (uke|week)|Week|Uke) (?P<weeknum>\d+)[^\n]*'
 FIRST_FLOOR_HEADER_A = r'GATE 1 & 2 \(TRANSIT,? 1st FLOOR\):?'
-FIRST_FLOOR_HEADER_B = r'TRANSIT(.*?1.*?(etg|etasje|etage))?:?'
+FIRST_FLOOR_HEADER_B = r'.{0,5}?TRANSIT(.*?1.*?(etg|etasje|etage))?:?'
 THIRD_FLOOR_HEADER_A = r'[^\n]*(EXPEDITI?ON(EN)?|EXPEDISJON(EN)?|Ekspedisjon(en)?) \(3rd FLOOR\):?'
 THIRD_FLOOR_HEADER_B = r'[^\n]*(EXPEDITI?ON(EN)?|EXPEDISJON(EN)?|Ekspedisjon(en)?)(.*?3.*?(etg|etasje|etage))?:?'
 
@@ -82,6 +82,21 @@ patterns_daily_combined = (
 )
 patterns_daily_combined = [p.format(**HEADERS) for p in patterns_daily_combined]
 
+patterns_headerless_combined = (
+    r'{FIRST_FLOOR_HEADER_A}\s*(?P<first>.*?)\s+'
+    r'{THIRD_FLOOR_HEADER_A}\s*(?P<third>.*)',
+
+    r'{FIRST_FLOOR_HEADER_B}\s*(?P<first>.*?)\s+'
+    r'{THIRD_FLOOR_HEADER_B}\s*(?P<third>.*)',
+
+    r'{THIRD_FLOOR_HEADER_A}\s*(?P<third>.*?)\s+'
+    r'{FIRST_FLOOR_HEADER_A}\s*(?P<first>.*)',
+
+    r'{THIRD_FLOOR_HEADER_B}\s*(?P<third>.*?)\s+'
+    r'{FIRST_FLOOR_HEADER_B}\s*(?P<first>.*)',
+    )
+patterns_headerless_combined = [p.format(**HEADERS) for p in patterns_headerless_combined]
+
 pattern_days = [
     r'(MANDAG|MONDAY):?\s*(.*?)\s*\n\s*([^\n]*(TIRSDAG|TUESDAY|ONSDAG|WEDNESDAY|WENDSDAY|WEDNESAY|TORSDAG|THURSDAY|FREDAG|FRIDAY))|$',
     r'(TIRSDAG|TUESDAY):?\s*(.*?)\s*\n\s*([^\n]*(ONSDAG|WEDNESDAY|WENDSDAY"WEDNESAY|TORSDAG|THURSDAY|FREDAG|FRIDAY))|$',
@@ -126,14 +141,19 @@ def run(post_menu=None):
             post_menu('_Could not find a menu for the third floor today_ :disappointed:')
 
 
+def msg_time_distance(created_time, ref):
+    """Measure time distance (in days) from a reference"""
+    msg_dt = datetime.datetime.strptime(
+        created_time,
+        '%Y-%m-%dT%H:%M:%S%z'
+    )
+    return abs(msg_dt - ref).days
+
+
 def filter_msg_distance(posts, ref, days):
     """Filter any message by distance from a reference"""
     for post in posts:
-        msg_dt = datetime.datetime.strptime(
-            post['created_time'],
-            '%Y-%m-%dT%H:%M:%S%z'
-        )
-        if abs(msg_dt - ref).days <= days:
+        if msg_time_distance(post['created_time'], ref) <= days:
             yield post
 
 
@@ -197,9 +217,8 @@ def get_menus_for_week(posts, week_number):
     menu_first_floor = None
     menu_third_floor = None
     for post in posts:
-        # time = post['created_time']
+        time = post['created_time']
         message = post['message']
-
         if (menu_first_floor is None and menu_third_floor is None):
             for pattern in patterns_combined:
                 match = re.match(pattern, message, flags=combined_flags)
@@ -219,7 +238,11 @@ def get_menus_for_week(posts, week_number):
             logger.info('Found post that matches third floor menu for this week')
             menu_third_floor = extract_menu(message)
         else:
-            logger.debug('Not a menu for week %d:\n%s', week_number, message)
+            if menu_first_floor is None and menu_third_floor is None:
+                menu_first_floor, menu_third_floor = extract_headerless_week_menu(message, time)
+                if menu_first_floor and menu_third_floor:
+                    return menu_first_floor, menu_third_floor
+                logger.debug('Not a menu for week %d:\n%s', week_number, message)
 
         if menu_first_floor is not None and menu_third_floor is not None:
             break
@@ -237,6 +260,29 @@ def is_matching_message(message, floor_patterns, week_number, flags=None):
         if week_match is not None and int(week_match.group('weeknum')) == week_number:
             return True
     return False
+
+
+def extract_headerless_week_menu(message, time):
+    date = datetime.datetime.now(timezone('Europe/Oslo'))
+    menu_first_floor = None
+    menu_third_floor = None
+
+    if msg_time_distance(time, date) <= 10:
+        for pattern in patterns_headerless_combined:
+            match = re.match(pattern, message, flags=combined_flags)
+            if match:
+                week_first, week_third = match.group('first', 'third')
+                menu_first_floor = extract_menu(week_first)
+                menu_third_floor = extract_menu(week_third)
+
+                if None in menu_first_floor or None in menu_third_floor:
+                    # Menu for the full week must be found.
+                    menu_first_floor = None
+                    menu_third_floor = None
+                    continue
+                return menu_first_floor, menu_third_floor
+
+    return menu_first_floor, menu_third_floor
 
 
 def trim_multiline(text):
