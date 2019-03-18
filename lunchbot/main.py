@@ -267,7 +267,7 @@ def extract_headerless_week_menu(message, time):
     menu_first_floor = None
     menu_third_floor = None
 
-    if msg_time_distance(time, date) <= 10:
+    if msg_time_distance(time, date) <= 5 + date.weekday():
         for pattern in patterns_headerless_combined:
             match = re.match(pattern, message, flags=combined_flags)
             if match:
