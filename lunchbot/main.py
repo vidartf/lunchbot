@@ -32,7 +32,7 @@ patterns_third_floor = [re.compile(p, flags=floor_flags) for p in patterns_third
 
 COMBINED_HEADER = r'((Meny(er)?|Menus?) (uke|week)|Week|Uke) (?P<weeknum>\d+)[^\n]*'
 FIRST_FLOOR_HEADER = r'[^\n]*TRANSIT[^\n]*'
-THIRD_FLOOR_HEADER = r'[^\n]*(EXPEDITI?ON(EN)?|EXPEDISJON(EN)?)[^\n]*'
+THIRD_FLOOR_HEADER = r'[^\n]*(EXPEDITI?ON(EN)?|EXPEDISJON(EN)?|EKSPEDISJON(EN)?)[^\n]*'
 
 COMBINED_DAILY_HEADER = (
     r'(Meny(er)?|Menus?) (?P<weekday>\w+)?\s?((?P<day>\d+)\.?)\s?(?P<month>\w+)[^\n]*'
@@ -49,6 +49,9 @@ patterns_combined = (
     r'{COMBINED_HEADER}\s+'
     r'{FIRST_FLOOR_HEADER}\s*(?P<first>.*?)\s+'
     r'{THIRD_FLOOR_HEADER}\s*(?P<third>.*)',
+    r'{COMBINED_HEADER}\s+'
+    r'{THIRD_FLOOR_HEADER}\s*(?P<third>.*)\s+'
+    r'{FIRST_FLOOR_HEADER}\s*(?P<first>.*?)',
 )
 combined_flags = re.IGNORECASE | re.DOTALL
 patterns_combined = [
@@ -59,6 +62,10 @@ patterns_daily_combined = (
     r'{COMBINED_DAILY_HEADER}\s+'
     r'{FIRST_FLOOR_HEADER}\s*(?P<first>.*?)\s+'
     r'{THIRD_FLOOR_HEADER}\s*(?P<third>.*)',
+
+    r'{COMBINED_DAILY_HEADER}\s+'
+    r'{THIRD_FLOOR_HEADER}\s*(?P<third>.*)\s+'
+    r'{FIRST_FLOOR_HEADER}\s*(?P<first>.*?)',
 )
 patterns_daily_combined = [
     re.compile(p.format(**HEADERS), flags=combined_flags)
