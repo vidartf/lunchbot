@@ -3,7 +3,7 @@
 
 from facepy import GraphAPI
 
-from slackclient import SlackClient
+from slack import WebClient
 
 
 def get_facebook_token(id, secret):
@@ -34,16 +34,15 @@ def filter_messages(posts):
 
 class SlackPoster:
     def __init__(self, token, channels):
-        self.client = SlackClient(token)
+        self.client = WebClient(token)
         self.channels = channels
 
     def post(self, message):
         for ch in self.channels:
-            self.client.api_call(
-                'chat.postMessage',
+            self.client.chat_postMessage(
                 channel=ch,
                 text=message,
                 as_user=False,
                 username='lunchbot',
-                icon_emoji=':spaghetti:'
+                icon_emoji=':spaghetti:',
             )
