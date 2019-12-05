@@ -3,12 +3,16 @@
 
 
 from datetime import datetime
+import logging
 
 import requests
 from bs4 import BeautifulSoup
 from facepy import GraphAPI
 from pytz import timezone
 from slack import WebClient
+
+
+logger = logging.getLogger("lunchbot")
 
 
 def get_facebook_token(id, secret):
@@ -43,6 +47,7 @@ class SlackPoster:
         self.channels = channels
 
     def post(self, message):
+        logger.info("Posting %r to %s", message, self.channels)
         for ch in self.channels:
             self.client.chat_postMessage(
                 channel=ch,
