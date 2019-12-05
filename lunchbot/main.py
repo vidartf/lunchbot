@@ -10,17 +10,12 @@ import locale
 import logging
 from pytz import timezone
 
-from .config import config, parser, SLACK_TOKEN, FACEBOOK_SECRET, FACEBOOK_ID
+from .config import config, parser, SLACK_TOKEN, FACEBOOK_SECRET, FACEBOOK_ID, SLACK_CHANNELS
 from .apiwrappers import authenticated_graph, filter_messages, scrape_posts, SlackPoster
 
 
 logger = logging.getLogger('lunchbot')
 locale.setlocale(locale.LC_ALL, "no_NO")
-
-# Where to post:
-channels = ['lunch', 'lunchbotdev']
-channels = ['lunchbotdev']
-
 
 floor_flags = re.IGNORECASE
 patterns_first_floor = (
@@ -89,8 +84,8 @@ def run(post_menu=None):
 
     if post_menu is None:
         # Fail early for slack issues, as that is our main output channel:
-        logger.info('Initializing slack client...')
-        sp = SlackPoster(SLACK_TOKEN, channels)
+        logger.info('Initializing slack client with channels %s...', SLACK_CHANNELS)
+        sp = SlackPoster(SLACK_TOKEN, SLACK_CHANNELS)
         post_menu = sp.post
 
     menu = Menu(None, None)
