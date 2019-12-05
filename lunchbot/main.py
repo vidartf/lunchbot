@@ -19,78 +19,66 @@ locale.setlocale(locale.LC_ALL, "no_NO")
 
 # Where to post:
 channels = ['lunch', 'lunchbotdev']
+channels = ['lunchbotdev']
 
 
-patterns_first_floor = (r'(Meny|Menu) (uke|week) (?P<weeknum>\d+)(\D|\n)(.|\n)*?1.*?(etg|etasje|etage):?',
-    r'(Meny|Menu) Transit (uke|week) (?P<weeknum>\d+):?')
-patterns_third_floor = (r'Meny (uke|week) (?P<weeknum>\d+)(\D|\n)(.|\n)*?3.*?(etg|etasje|etage):?',
-    r'(Meny|Menu) Expeditionen (uke|week) (?P<weeknum>\d+):?')
+floor_flags = re.IGNORECASE
+patterns_first_floor = (
+    r'(Meny|Menu) (uke|week) (?P<weeknum>\d+)(\D|\n)(.|\n)*?1.*?(etg|etasje|etage):?',
+    r'(Meny|Menu) Transit (uke|week) (?P<weeknum>\d+):?',
+)
+patterns_third_floor = (
+    r'Meny (uke|week) (?P<weeknum>\d+)(\D|\n)(.|\n)*?3.*?(etg|etasje|etage):?',
+    r'(Meny|Menu) Expeditionen (uke|week) (?P<weeknum>\d+):?',
+)
+
+patterns_first_floor = [re.compile(p, flags=floor_flags) for p in patterns_first_floor]
+patterns_third_floor = [re.compile(p, flags=floor_flags) for p in patterns_third_floor]
+
 COMBINED_HEADER = r'((Meny(er)?|Menus?) (uke|week)|Week|Uke) (?P<weeknum>\d+)[^\n]*'
-FIRST_FLOOR_HEADER_A = r'GATE 1 & 2 \(TRANSIT,? 1st FLOOR\):?'
-FIRST_FLOOR_HEADER_B = r'TRANSIT(.*?1.*?(etg|etasje|etage))?:?'
-THIRD_FLOOR_HEADER_A = r'(EXPEDITI?ON(EN)?|EXPEDISJON(EN)?|Ekspedisjon(en)?) \(3rd FLOOR\):?'
-THIRD_FLOOR_HEADER_B = r'(EXPEDITI?ON(EN)?|EXPEDISJON(EN)?|Ekspedisjon(en)?)(.*?3.*?(etg|etasje|etage))?:?'
+FIRST_FLOOR_HEADER = r'[^\n]*TRANSIT[^\n]*'
+THIRD_FLOOR_HEADER = r'[^\n]*(EXPEDITI?ON(EN)?|EXPEDISJON(EN)?)[^\n]*'
 
-COMBINED_DAILY_HEADER = r'(Meny(er)?|Menus?) (?P<weekday>\w+)?\s?((?P<day>\d+)\.?)\s?(?P<month>\w+)[^\n]*'
+COMBINED_DAILY_HEADER = (
+    r'(Meny(er)?|Menus?) (?P<weekday>\w+)?\s?((?P<day>\d+)\.?)\s?(?P<month>\w+)[^\n]*'
+)
 
 HEADERS = dict(
     COMBINED_HEADER=COMBINED_HEADER,
     COMBINED_DAILY_HEADER=COMBINED_DAILY_HEADER,
-    FIRST_FLOOR_HEADER_A=FIRST_FLOOR_HEADER_A,
-    FIRST_FLOOR_HEADER_B=FIRST_FLOOR_HEADER_B,
-    THIRD_FLOOR_HEADER_A=THIRD_FLOOR_HEADER_A,
-    THIRD_FLOOR_HEADER_B=THIRD_FLOOR_HEADER_B,
-    )
+    FIRST_FLOOR_HEADER=FIRST_FLOOR_HEADER,
+    THIRD_FLOOR_HEADER=THIRD_FLOOR_HEADER,
+)
 
 patterns_combined = (
     r'{COMBINED_HEADER}\s+'
-    r'{FIRST_FLOOR_HEADER_A}\s*(?P<first>.*?)\s+'
-    r'{THIRD_FLOOR_HEADER_A}\s*(?P<third>.*)',
-
-    r'{COMBINED_HEADER}\s+'
-    r'{FIRST_FLOOR_HEADER_B}\s*(?P<first>.*?)\s+'
-    r'{THIRD_FLOOR_HEADER_B}\s*(?P<third>.*)',
-
-    r'{COMBINED_HEADER}\s+'
-    r'{THIRD_FLOOR_HEADER_A}\s*(?P<third>.*?)\s+'
-    r'{FIRST_FLOOR_HEADER_A}\s*(?P<first>.*)',
-
-    r'{COMBINED_HEADER}\s+'
-    r'{THIRD_FLOOR_HEADER_B}\s*(?P<third>.*?)\s+'
-    r'{FIRST_FLOOR_HEADER_B}\s*(?P<first>.*)',
-    )
-patterns_combined = [p.format(**HEADERS) for p in patterns_combined]
-floor_flags = re.IGNORECASE
+    r'{FIRST_FLOOR_HEADER}\s*(?P<first>.*?)\s+'
+    r'{THIRD_FLOOR_HEADER}\s*(?P<third>.*)',
+)
 combined_flags = re.IGNORECASE | re.DOTALL
+patterns_combined = [
+    re.compile(p.format(**HEADERS), flags=combined_flags) for p in patterns_combined
+]
 
 patterns_daily_combined = (
     r'{COMBINED_DAILY_HEADER}\s+'
-    r'{FIRST_FLOOR_HEADER_A}\s*(?P<first>.*?)\s+'
-    r'{THIRD_FLOOR_HEADER_A}\s*(?P<third>.*)',
-
-    r'{COMBINED_DAILY_HEADER}\s+'
-    r'{FIRST_FLOOR_HEADER_B}\s*(?P<first>.*?)\s+'
-    r'{THIRD_FLOOR_HEADER_B}\s*(?P<third>.*)',
-
-    r'{COMBINED_DAILY_HEADER}\s+'
-    r'{THIRD_FLOOR_HEADER_A}\s*(?P<third>.*?)\s+'
-    r'{FIRST_FLOOR_HEADER_A}\s*(?P<first>.*)',
-
-    r'{COMBINED_DAILY_HEADER}\s+'
-    r'{THIRD_FLOOR_HEADER_B}\s*(?P<third>.*?)\s+'
-    r'{FIRST_FLOOR_HEADER_B}\s*(?P<first>.*)',
+    r'{FIRST_FLOOR_HEADER}\s*(?P<first>.*?)\s+'
+    r'{THIRD_FLOOR_HEADER}\s*(?P<third>.*)',
 )
-patterns_daily_combined = [p.format(**HEADERS) for p in patterns_daily_combined]
+patterns_daily_combined = [
+    re.compile(p.format(**HEADERS), flags=combined_flags)
+    for p in patterns_daily_combined
+]
 
 pattern_days = [
     r'(MANDAG|MONDAY):?\s*(.*?)\s*\n\s*([^\n]*(TIRSDAG|TUESDAY|ONSDAG|WEDNESDAY|WENDSDAY|WEDNESAY|TORSDAG|THURSDAY|FREDAG|FRIDAY))|$',
     r'(TIRSDAG|TUESDAY):?\s*(.*?)\s*\n\s*([^\n]*(ONSDAG|WEDNESDAY|WENDSDAY"WEDNESAY|TORSDAG|THURSDAY|FREDAG|FRIDAY))|$',
     r'(ONSDAG|WEDNESDAY|WENDSDAY|WEDNESAY):?\s*(.*?)\s*\n\s*([^\n]*(TORSDAG|THURSDAY|FREDAG|FRIDAY))|$',
     r'(TORSDAG|THURSDAY):?\s*(.*?)\s*\n\s*[^\n]*((FREDAG|FRIDAY))|$',
-    r'(FREDAG|FRIDAY):?\s*(.*?)\s*$'
+    r'(FREDAG|FRIDAY):?\s*(.*?)\s*$',
 ]
 days_flags = re.IGNORECASE | re.DOTALL
-
+pattern_days = [re.compile(p, flags=combined_flags) for p in pattern_days]
 
 Menu = collections.namedtuple('Menu', ('first', 'third'))
 
@@ -120,11 +108,15 @@ def run(post_menu=None):
         if menu.first:
             post_menu('*First floor menu:*\n' + menu.first)
         else:
-            post_menu('_Could not find a menu for the first floor today_ :disappointed:')
+            post_menu(
+                '_Could not find a menu for the first floor today_ :disappointed:'
+            )
         if menu.third:
             post_menu('*Third floor menu:*\n' + menu.third)
         else:
-            post_menu('_Could not find a menu for the third floor today_ :disappointed:')
+            post_menu(
+                '_Could not find a menu for the third floor today_ :disappointed:'
+            )
 
 
 def filter_msg_distance(posts, ref, days):
@@ -182,7 +174,7 @@ def get_menus_for_day(posts, date):
     for post in posts:
         message = post['message']
         for pattern in patterns_daily_combined:
-            match = re.match(pattern, message, flags=combined_flags)
+            match = pattern.search(message)
             if (
                 match is not None
                 and localized_month(match.group('month')) == month
@@ -204,9 +196,9 @@ def get_menus_for_week(posts, week_number):
         # time = post['created_time']
         message = post['message']
 
-        if (menu_first_floor is None and menu_third_floor is None):
+        if menu_first_floor is None and menu_third_floor is None:
             for pattern in patterns_combined:
-                match = re.match(pattern, message, flags=combined_flags)
+                match = pattern.search(message)
                 if match is not None and int(match.group('weeknum')) == week_number:
                     logger.info('Found post that matches a combined menu for this week')
                     week_first, week_third = match.group('first', 'third')
@@ -214,12 +206,18 @@ def get_menus_for_week(posts, week_number):
                     menu_third_floor = extract_menu(week_third)
                     return menu_first_floor, menu_third_floor
             else:
-                logger.debug('Not a combined menu for week %d:\n%s', week_number, message)
+                logger.debug(
+                    'Not a combined menu for week %d:\n%s', week_number, message
+                )
 
-        if menu_first_floor is None and is_matching_message(message, patterns_first_floor, week_number):
+        if menu_first_floor is None and is_matching_message(
+            message, patterns_first_floor, week_number
+        ):
             logger.info('Found post that matches first floor menu for this week')
             menu_first_floor = extract_menu(message)
-        elif menu_third_floor is None and is_matching_message(message, patterns_third_floor, week_number):
+        elif menu_third_floor is None and is_matching_message(
+            message, patterns_third_floor, week_number
+        ):
             logger.info('Found post that matches third floor menu for this week')
             menu_third_floor = extract_menu(message)
         else:
@@ -232,12 +230,10 @@ def get_menus_for_week(posts, week_number):
     return menu_first_floor, menu_third_floor
 
 
-def is_matching_message(message, floor_patterns, week_number, flags=None):
+def is_matching_message(message, floor_patterns, week_number):
     """Check if a message conatins a menu for given floor pattern and week number"""
-    if flags is None:
-        flags = floor_flags
     for floor_pattern in floor_patterns:
-        week_match = re.match(floor_pattern, message, flags=flags)
+        week_match = floor_pattern.search(message)
         if week_match is not None and int(week_match.group('weeknum')) == week_number:
             return True
     return False
@@ -251,7 +247,7 @@ def extract_menu(message):
     """Extract the menu from a message"""
     menu = [None] * 5
     for day in range(5):
-        match = re.search(pattern_days[day], message, flags=days_flags)
+        match = pattern_days[day].search(message)
         if match and match.group(2):
             logger.info('Found menu for day %d', day)
             logger.debug(match.groups())
