@@ -36,7 +36,9 @@ setuptools_args = {}
 setuptools_args['install_requires'] = [
     'facepy',
     'slackclient',
-    'pytz'
+    'bs4',
+    'requests',
+    'pytz',
 ]
 
 extras_require = setuptools_args['extras_require'] = {
