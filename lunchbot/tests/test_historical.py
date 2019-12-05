@@ -14,7 +14,6 @@ from lunchbot.main import (
     patterns_third_floor,
     patterns_combined,
     patterns_daily_combined,
-    combined_flags
 )
 
 pattern_daynames = re.compile(r'MANDAG|TIRSDAG|ONSDAG|TORSDAG|FREDAG|MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY')
@@ -23,7 +22,7 @@ pattern_daynames = re.compile(r'MANDAG|TIRSDAG|ONSDAG|TORSDAG|FREDAG|MONDAY|TUES
 
 def split_combined(message):
     for pattern in patterns_combined:
-        match = re.match(pattern, message, flags=combined_flags)
+        match = pattern.match(message)
         if match is not None:
             return match.group('first', 'third')
 
@@ -46,7 +45,7 @@ def test_extract_menu(historical_weekly):
             # Assert that the menu was found
             assert entry is not None, "No menu entry found for day %d" % day
             # Assert that there was no "bleedover" between days
-            assert not re.match(pattern_daynames, entry)
+            assert not pattern_daynames.match(entry)
 
 
 def test_first_floor_match(historical_first_floor):
@@ -60,7 +59,7 @@ def test_third_floor_match(historical_third_floor):
 
 def test_combined_match(historical_combined):
     week_num, message = historical_combined
-    assert is_matching_message(message, patterns_combined, week_num, combined_flags)
+    assert is_matching_message(message, patterns_combined, week_num)
 
 def test_daily_sanity(historical_daily_post):
     date, post = historical_daily_post
