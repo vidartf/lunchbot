@@ -11,7 +11,7 @@ import logging
 from pytz import timezone
 
 from .config import config, parser, SLACK_TOKEN, FACEBOOK_SECRET, FACEBOOK_ID
-from .apiwrappers import authenticated_graph, filter_messages, SlackPoster
+from .apiwrappers import authenticated_graph, filter_messages, scrape_posts, SlackPoster
 
 
 logger = logging.getLogger('lunchbot')
@@ -108,11 +108,12 @@ def run(post_menu=None):
     menu = Menu(None, None)
 
     try:
-        logger.info('Initializing Facebook graph API...')
-        graph = authenticated_graph(FACEBOOK_ID, FACEBOOK_SECRET)
+        # logger.info('Initializing Facebook graph API...')
+        # graph = authenticated_graph(FACEBOOK_ID, FACEBOOK_SECRET)
 
         logger.info('Getting facebook posts...')
-        posts = graph.get('technopolisitfornebu/posts')
+        # posts = graph.get('technopolisitfornebu/published_posts')['data']
+        posts = scrape_posts("technopolisitfornebu")
 
         menu = get_menus(posts, datetime.datetime.now(timezone('Europe/Oslo')))
     finally:
@@ -129,12 +130,14 @@ def run(post_menu=None):
 def filter_msg_distance(posts, ref, days):
     """Filter any message by distance from a reference"""
     for post in posts:
-        msg_dt = datetime.datetime.strptime(
-            post['created_time'],
-            '%Y-%m-%dT%H:%M:%S%z'
-        )
+        msg_dt = datetime.datetime.strptime(post['created_time'], '%Y-%m-%dT%H:%M:%S%z')
         if abs(msg_dt - ref).days <= days:
+            logger.info("checking post from: {}".format(post['created_time']))
+            logger.debug(' '.join(post['message'].lstrip().splitlines()[:1]))
             yield post
+        else:
+            logger.debug("ignoring post from: {}".format(post['created_time']))
+            logger.debug(' '.join(post['message'].lstrip().splitlines()[:1]))
 
 
 def localized_month(monthstr):
@@ -147,16 +150,16 @@ def localized_month(monthstr):
 def get_menus(posts, date):
     """Get the menu for the given date."""
     # First, try daily menu:
+    posts = list(filter_msg_distance(filter_messages(posts), date, 14))
     menu = get_menus_for_day(posts, date)
     if menu:
         return menu
 
     # Then, check for weekly menu
     week_number = date.isocalendar()[1]
-    menu_first_floor, menu_third_floor = get_menus_for_week(
-        filter_messages(posts),
-        week_number
-    )
+
+    logger.info("No daily menu, checking for week {}".format(week_number))
+    menu_first_floor, menu_third_floor = get_menus_for_week(posts, week_number)
     menus = [None, None]
     if menu_first_floor or menu_third_floor:
         weekday = date.weekday()
@@ -176,11 +179,12 @@ def get_menus_for_day(posts, date):
     month = date.month
     year = date.year
 
-    for post in filter_msg_distance(filter_messages(posts), date, 10):
+    for post in posts:
         message = post['message']
         for pattern in patterns_daily_combined:
             match = re.match(pattern, message, flags=combined_flags)
-            if (match is not None
+            if (
+                match is not None
                 and localized_month(match.group('month')) == month
                 and int(match.group('day')) == day
             ):
@@ -270,6 +274,7 @@ def main(args=None, post_menu=None):
     logging.basicConfig(level=loglevel)
 
     run(post_menu=post_menu)
+
 
 if __name__ == '__main__':
     main()
