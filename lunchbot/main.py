@@ -74,12 +74,24 @@ patterns_daily_combined = [
     for p in patterns_daily_combined
 ]
 
+patterns_daily = (
+    r'{FIRST_FLOOR_HEADER}\s*(?P<first>.*?)\s+'
+    r'{THIRD_FLOOR_HEADER}\s*(?P<third>.*)',
+
+    r'{THIRD_FLOOR_HEADER}\s*(?P<third>.*)\s+'
+    r'{FIRST_FLOOR_HEADER}\s*(?P<first>.*?)',
+)
+patterns_daily = [
+    re.compile(p.format(**HEADERS), flags=combined_flags)
+    for p in patterns_daily
+]
+
 pattern_days = [
-    r'(MANDAG|MONDAY):?\s*(.*?)\s*\n\s*([^\n]*(TIRSDAG|TUESDAY|ONSDAG|WEDNESDAY|WENDSDAY|WEDNESAY|TORSDAG|THURSDAY|FREDAG|FRIDAY))|$',
-    r'(TIRSDAG|TUESDAY):?\s*(.*?)\s*\n\s*([^\n]*(ONSDAG|WEDNESDAY|WENDSDAY"WEDNESAY|TORSDAG|THURSDAY|FREDAG|FRIDAY))|$',
-    r'(ONSDAG|WEDNESDAY|WENDSDAY|WEDNESAY):?\s*(.*?)\s*\n\s*([^\n]*(TORSDAG|THURSDAY|FREDAG|FRIDAY))|$',
-    r'(TORSDAG|THURSDAY):?\s*(.*?)\s*\n\s*[^\n]*((FREDAG|FRIDAY))|$',
-    r'(FREDAG|FRIDAY):?\s*(.*?)\s*$',
+    r'(MANDAG|MONDAY):?\s*(.*?)[\s\-]*\n\s*([^\n]*(TIRSDAG|TUESDAY|ONSDAG|WEDNESDAY|WENDSDAY|WEDNESAY|TORSDAG|THURSDAY|FREDAG|FRIDAY))|$',
+    r'(TIRSDAG|TUESDAY):?\s*(.*?)[\s\-]*\n\s*([^\n]*(ONSDAG|WEDNESDAY|WENDSDAY"WEDNESAY|TORSDAG|THURSDAY|FREDAG|FRIDAY))|$',
+    r'(ONSDAG|WEDNESDAY|WENDSDAY|WEDNESAY):?\s*(.*?)[\s\-]*\n\s*([^\n]*(TORSDAG|THURSDAY|FREDAG|FRIDAY))|$',
+    r'(TORSDAG|THURSDAY):?\s*(.*?)[\s\-]*\n\s*[^\n]*((FREDAG|FRIDAY))|$',
+    r'(FREDAG|FRIDAY):?\s*(.*?)[\s\-]*$',
 ]
 days_flags = re.IGNORECASE | re.DOTALL
 pattern_days = [re.compile(p, flags=combined_flags) for p in pattern_days]
@@ -113,7 +125,7 @@ def run(post_menu=None):
             post_menu('*First floor menu:*\n' + menu.first)
         if menu.third:
             post_menu('*Third floor menu:*\n' + menu.third)
-        if menu.combined:
+        if menu.combined and not (menu.first or menu.third):
             post_menu("*Today's menu:*\n" + menu.combined)
         else:
             # not combined, post a single sad message
@@ -219,7 +231,18 @@ def get_menus_for_week(posts, week_number):
             return [Menu(first=first, third=third) for first, third in zip(menu_first_floor, menu_third_floor)]
 
     # weekly menu, by day first, not floor
-    return [Menu(combined=menu) for menu in extract_menu(message)]
+    menus = []
+    for combined in extract_menu(message):
+        for pattern in patterns_daily:
+            match = pattern.search(combined)
+            if not match:
+                continue
+            first, third = match.group('first', 'third')
+            if first and third:
+                combined = None
+                break
+        menus.append(Menu(first=first, third=third, combined=combined))
+    return menus
 
 
 def is_matching_message(message, floor_patterns, week_number):
