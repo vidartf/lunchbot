@@ -30,7 +30,7 @@ patterns_third_floor = (
 patterns_first_floor = [re.compile(p, flags=floor_flags) for p in patterns_first_floor]
 patterns_third_floor = [re.compile(p, flags=floor_flags) for p in patterns_third_floor]
 
-COMBINED_HEADER = r'((Meny(er)?|Menus?) (uke|week)|Week|Uke) (?P<weeknum>\d+)[^\n]*'
+COMBINED_HEADER = r'((Meny(er)?|Menus?).*(uke|week)|Week|Uke).*(?P<weeknum>\d+)[^\n]*'
 FIRST_FLOOR_HEADER = r'[^\n]*TRANSIT[^\n]*'
 THIRD_FLOOR_HEADER = r'[^\n]*(EXPEDITI?ON(EN)?|EXPEDISJON(EN)?|EKSPEDISJON(EN)?)[^\n]*'
 
@@ -58,6 +58,8 @@ patterns_combined = [
     re.compile(p.format(**HEADERS), flags=combined_flags) for p in patterns_combined
 ]
 
+weekly_pattern = re.compile(COMBINED_HEADER, flags=combined_flags)
+
 patterns_daily_combined = (
     r'{COMBINED_DAILY_HEADER}\s+'
     r'{FIRST_FLOOR_HEADER}\s*(?P<first>.*?)\s+'
@@ -82,7 +84,7 @@ pattern_days = [
 days_flags = re.IGNORECASE | re.DOTALL
 pattern_days = [re.compile(p, flags=combined_flags) for p in pattern_days]
 
-Menu = collections.namedtuple('Menu', ('first', 'third'))
+Menu = collections.namedtuple('Menu', ('first', 'third', 'combined'), defaults=(None, None, None))
 
 
 def run(post_menu=None):
@@ -95,7 +97,7 @@ def run(post_menu=None):
         sp = SlackPoster(SLACK_TOKEN, SLACK_CHANNELS)
         post_menu = sp.post
 
-    menu = Menu(None, None)
+    menu = Menu()
 
     try:
         # logger.info('Initializing Facebook graph API...')
@@ -109,16 +111,24 @@ def run(post_menu=None):
     finally:
         if menu.first:
             post_menu('*First floor menu:*\n' + menu.first)
-        else:
-            post_menu(
-                '_Could not find a menu for the first floor today_ :disappointed:'
-            )
         if menu.third:
             post_menu('*Third floor menu:*\n' + menu.third)
+        if menu.combined:
+            post_menu("*Today's menu:*\n" + menu.combined)
         else:
-            post_menu(
-                '_Could not find a menu for the third floor today_ :disappointed:'
-            )
+            # not combined, post a single sad message
+            if not menu.first and not menu.third:
+                post_menu(
+                    '_Could not find a menu for today_ :disappointed:'
+                )
+            if menu.first and not menu.third:
+                post_menu(
+                    '_Could not find a menu for the third floor today_ :disappointed:'
+                )
+            elif menu.third and not menu.first:
+                post_menu(
+                    '_Could not find a menu for the first floor today_ :disappointed:'
+                )
 
 
 def filter_msg_distance(posts, ref, days):
@@ -153,17 +163,12 @@ def get_menus(posts, date):
     week_number = date.isocalendar()[1]
 
     logger.info("No daily menu, checking for week {}".format(week_number))
-    menu_first_floor, menu_third_floor = get_menus_for_week(posts, week_number)
-    menus = [None, None]
-    if menu_first_floor or menu_third_floor:
-        weekday = date.weekday()
-        if weekday < 5:
-            if menu_first_floor and menu_first_floor[weekday]:
-                menus[0] = menu_first_floor[weekday]
-            if menu_third_floor and menu_third_floor[weekday]:
-                menus[1] = menu_third_floor[weekday]
-
-    return Menu(*menus)
+    menus = get_menus_for_week(posts, week_number)
+    weekday = date.weekday()
+    if weekday < 5:
+        return menus[weekday]
+    else:
+        return Menu()
 
 
 def get_menus_for_day(posts, date):
@@ -171,7 +176,6 @@ def get_menus_for_day(posts, date):
     # First, try daily menu:
     day = date.day
     month = date.month
-    year = date.year
 
     for post in posts:
         message = post['message']
@@ -194,42 +198,28 @@ def get_menus_for_week(posts, week_number):
     """Get the menu for the given week number."""
     menu_first_floor = None
     menu_third_floor = None
+    # first, find the post with a likely weekly menu
     for post in posts:
-        # time = post['created_time']
         message = post['message']
-
-        if menu_first_floor is None and menu_third_floor is None:
-            for pattern in patterns_combined:
-                match = pattern.search(message)
-                if match is not None and int(match.group('weeknum')) == week_number:
-                    logger.info('Found post that matches a combined menu for this week')
-                    week_first, week_third = match.group('first', 'third')
-                    menu_first_floor = extract_menu(week_first)
-                    menu_third_floor = extract_menu(week_third)
-                    return menu_first_floor, menu_third_floor
-            else:
-                logger.debug(
-                    'Not a combined menu for week %d:\n%s', week_number, message
-                )
-
-        if menu_first_floor is None and is_matching_message(
-            message, patterns_first_floor, week_number
-        ):
-            logger.info('Found post that matches first floor menu for this week')
-            menu_first_floor = extract_menu(message)
-        elif menu_third_floor is None and is_matching_message(
-            message, patterns_third_floor, week_number
-        ):
-            logger.info('Found post that matches third floor menu for this week')
-            menu_third_floor = extract_menu(message)
-        else:
-            logger.debug('Not a menu for week %d:\n%s', week_number, message)
-
-        if menu_first_floor is not None and menu_third_floor is not None:
+        match = weekly_pattern.search(message)
+        if match:
+            logger.warning("Found likely weekly menu from %s", post['created_time'])
             break
     else:
-        logger.warning('No posts to process!')
-    return menu_first_floor, menu_third_floor
+        logger.warning('No weekly menu found!')
+        return [Menu() for i in range(5)]
+
+    for pattern in patterns_combined:
+        match = pattern.search(message)
+        if match is not None and int(match.group('weeknum')) == week_number:
+            logger.info('Found post that matches a combined menu for this week')
+            week_first, week_third = match.group('first', 'third')
+            menu_first_floor = extract_menu(week_first)
+            menu_third_floor = extract_menu(week_third)
+            return [Menu(first=first, third=third) for first, third in zip(menu_first_floor, menu_third_floor)]
+
+    # weekly menu, by day first, not floor
+    return [Menu(combined=menu) for menu in extract_menu(message)]
 
 
 def is_matching_message(message, floor_patterns, week_number):
